@@ -16,8 +16,8 @@ jobs:
         with: {node-version: '22', cache: npm}
       - run: npm ci
       - run: npm run check
-      - run: npm test
       - run: npm run build
+      - run: npm test
   release:
     needs: validate
     if: github.event_name != 'pull_request'
