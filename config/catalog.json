@@ -1,0 +1,2609 @@
+[
+  {
+    "id": "local-server-services",
+    "title": "Local server services and Qwen",
+    "application": "local",
+    "panels": [
+      {
+        "id": "active",
+        "title": "Required service health",
+        "unit": "short",
+        "queries": [
+          "local_server_service_active"
+        ]
+      },
+      {
+        "id": "qwen",
+        "title": "Qwen model and API health",
+        "unit": "short",
+        "queries": [
+          "local_server_qwen_health"
+        ]
+      },
+      {
+        "id": "restarts",
+        "title": "Service restarts",
+        "unit": "short",
+        "queries": [
+          "local_server_service_restarts_total"
+        ]
+      },
+      {
+        "id": "memory",
+        "title": "Service resident memory",
+        "unit": "bytes",
+        "queries": [
+          "local_server_service_memory_bytes"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "node-system",
+    "title": "Linux node / CPU and system",
+    "application": "local",
+    "panels": [
+      {
+        "id": "2",
+        "title": "CPU usage",
+        "unit": "percent",
+        "queries": [
+          "(((count by (instance) (count(node_cpu_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) by (cpu, instance))) \n- \nsum by (instance) (sum by (instance, mode)(irate(node_cpu_seconds_total{mode=~'idle|iowait|steal',job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])))) * 100) \n/ \ncount by(instance) (count(node_cpu_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) by (cpu, instance))\n"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "CPU usage",
+        "unit": "percent",
+        "queries": [
+          "(100 - sum without (mode) (rate(node_cpu_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", mode=~\"idle|iowait|steal\"}[$__rate_interval])) * 100 )\n"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "CPU usage by modes",
+        "unit": "percent",
+        "queries": [
+          "sum by(instance, mode) (irate(node_cpu_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])) \n/ on(instance) \ngroup_left sum by (instance)((irate(node_cpu_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval]))) * 100\n"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Load average",
+        "unit": "short",
+        "queries": [
+          "node_load1{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_load5{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_load15{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "count without (cpu) (node_cpu_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", mode=\"idle\"})"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Context switches/Interrupts",
+        "unit": "short",
+        "queries": [
+          "irate(node_context_switches_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_intr_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Timezone",
+        "unit": "short",
+        "queries": [
+          "node_time_zone_offset_seconds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "NTP status",
+        "unit": "short",
+        "queries": [
+          "node_timex_sync_status{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Time synchronized drift",
+        "unit": "s",
+        "queries": [
+          "node_timex_estimated_error_seconds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_timex_offset_seconds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_timex_maxerror_seconds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "node-disk",
+    "title": "Linux node / filesystem and disks",
+    "application": "local",
+    "panels": [
+      {
+        "id": "2",
+        "title": "Filesystem space availabe",
+        "unit": "bytes",
+        "queries": [
+          "node_filesystem_avail_bytes{fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Disk space usage",
+        "unit": "bytes",
+        "queries": [
+          "node_filesystem_size_bytes{fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_filesystem_avail_bytes{fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Free inodes",
+        "unit": "short",
+        "queries": [
+          "node_filesystem_files_free{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Total inodes",
+        "unit": "short",
+        "queries": [
+          "node_filesystem_files{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Filesystems with errors / read-only",
+        "unit": "short",
+        "queries": [
+          "node_filesystem_device_error{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}",
+          "node_filesystem_readonly{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", fstype!=\"\", mountpoint!=\"\"}"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "File descriptors",
+        "unit": "short",
+        "queries": [
+          "process_max_fds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "process_open_fds{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Disk reads/writes",
+        "unit": "Bps",
+        "queries": [
+          "irate(node_disk_read_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "irate(node_disk_written_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "irate(node_disk_io_time_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Disk I/O",
+        "unit": "iops",
+        "queries": [
+          "irate(node_disk_reads_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n",
+          "irate(node_disk_writes_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Disk average wait time",
+        "unit": "s",
+        "queries": [
+          "irate(node_disk_read_time_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n/\nirate(node_disk_reads_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n",
+          "irate(node_disk_write_time_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n/\nirate(node_disk_writes_completed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])\n"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Disk average queue",
+        "unit": "short",
+        "queries": [
+          "irate(node_disk_io_time_weighted_seconds_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "node-logs",
+    "title": "Linux node / logs",
+    "application": "local",
+    "panels": []
+  },
+  {
+    "id": "node-memory",
+    "title": "Linux node / memory",
+    "application": "local",
+    "panels": [
+      {
+        "id": "2",
+        "title": "Memory usage",
+        "unit": "percent",
+        "queries": [
+          "100 -\n(\n  avg by (instance) (node_memory_MemAvailable_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) /\n  avg by (instance) (node_memory_MemTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"})\n* 100\n)\n"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Memory usage",
+        "unit": "bytes",
+        "queries": [
+          "(\n  node_memory_MemTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_MemFree_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_Buffers_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_Cached_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n)\n",
+          "node_memory_Cached_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_MemAvailable_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Buffers_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_MemFree_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_MemTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Memory pages in / out",
+        "unit": "short",
+        "queries": [
+          "irate(node_vmstat_pgpgin{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_vmstat_pgpgout{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Memory pages swapping in / out",
+        "unit": "short",
+        "queries": [
+          "irate(node_vmstat_pswpin{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_vmstat_pswpout{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Memory page faults",
+        "unit": "short",
+        "queries": [
+          "irate(node_vmstat_pgmajfault{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_vmstat_pgfault{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])\n-\nirate(node_vmstat_pgmajfault{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])\n"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "OOM Killer",
+        "unit": "short",
+        "queries": [
+          "increase(node_vmstat_oom_kill{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__interval:] offset -$__interval)"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Memory active / inactive",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_Active_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Inactive_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Memory active / inactive details",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_Inactive_file_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Inactive_anon_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Active_file_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Active_anon_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Memory commited",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_Committed_AS_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_CommitLimit_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "13",
+        "title": "Memory shared and mapped",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_Mapped_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Shmem_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_ShmemPmdMapped_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_ShmemHugePages_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "14",
+        "title": "Memory writeback and dirty",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_Writeback_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_WritebackTmp_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Dirty_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "15",
+        "title": "Memory Vmalloc",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_VmallocChunk_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_VmallocTotal_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_VmallocUsed_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "16",
+        "title": "Memory slab",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_SUnreclaim_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_SReclaimable_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "17",
+        "title": "Memory anonymous",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_AnonHugePages_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_AnonPages_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "18",
+        "title": "Memory HugePages counter",
+        "unit": "short",
+        "queries": [
+          "node_memory_HugePages_Free{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_HugePages_Rsvd{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_HugePages_Surp{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "19",
+        "title": "Memory HugePages size",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_HugePages_Total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Hugepagesize_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "20",
+        "title": "Memory direct map",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_DirectMap1G_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_DirectMap2M_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_DirectMap4k_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "21",
+        "title": "Memory bounce",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_Bounce_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "node-network",
+    "title": "Linux node / network",
+    "application": "local",
+    "panels": [
+      {
+        "id": "2",
+        "title": "Network interfaces overview",
+        "unit": "short",
+        "queries": [
+          "node_network_up{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_network_carrier{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "irate(node_network_transmit_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])*8",
+          "irate(node_network_receive_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])*8",
+          "node_arp_entries{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_network_mtu_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_network_speed_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"} * 8",
+          "node_network_transmit_queue_length{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_network_info{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Network traffic",
+        "unit": "bps",
+        "queries": [
+          "irate(node_network_receive_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])*8\n# only show interfaces that had traffic change at least once during selected dashboard interval:\nand\nincrease(\n    node_network_receive_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__range]\n    ) > 0\n",
+          "irate(node_network_transmit_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])*8\n# only show interfaces that had traffic change at least once during selected dashboard interval:\nand\nincrease(\n    node_network_transmit_bytes_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__range]\n    ) > 0\n"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Network interfaces carrier status",
+        "unit": "short",
+        "queries": [
+          "node_network_carrier{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Network errors",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_receive_errs_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_network_transmit_errs_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Dropped packets",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_receive_drop_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_network_transmit_drop_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Network packets",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_receive_packets_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_network_transmit_packets_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Multicast packets",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_receive_multicast_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_network_transmit_multicast_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Network FIFO",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_receive_fifo_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_network_transmit_fifo_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Compressed packets",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_receive_compressed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_network_transmit_compressed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "NF conntrack",
+        "unit": "short",
+        "queries": [
+          "node_nf_conntrack_entries{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_nf_conntrack_entries_limit{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Softnet packets",
+        "unit": "pps",
+        "queries": [
+          "irate(node_softnet_processed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_softnet_dropped_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "13",
+        "title": "Softnet out of quota",
+        "unit": "pps",
+        "queries": [
+          "irate(node_softnet_times_squeezed_total{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "15",
+        "title": "Sockets in use",
+        "unit": "short",
+        "queries": [
+          "node_sockstat_sockets_used{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "16",
+        "title": "Sockets TCP",
+        "unit": "short",
+        "queries": [
+          "node_sockstat_TCP_alloc{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_TCP_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_TCP6_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_TCP_orphan{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_TCP_tw{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "17",
+        "title": "Sockets UDP",
+        "unit": "short",
+        "queries": [
+          "node_sockstat_UDPLITE_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_UDP_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_UDPLITE6_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_UDP6_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "18",
+        "title": "Sockets memory",
+        "unit": "short",
+        "queries": [
+          "node_sockstat_TCP_mem{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_UDP_mem{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_TCP_mem_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_UDP_mem_bytes{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "19",
+        "title": "Sockets other",
+        "unit": "short",
+        "queries": [
+          "node_sockstat_FRAG_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_FRAG6_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_RAW_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_sockstat_RAW6_inuse{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "21",
+        "title": "IP octets",
+        "unit": "oct/s",
+        "queries": [
+          "irate(node_netstat_IpExt_InOctets{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_IpExt_OutOctets{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "22",
+        "title": "TCP segments",
+        "unit": "seg/s",
+        "queries": [
+          "irate(node_netstat_Tcp_InSegs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Tcp_OutSegs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "23",
+        "title": "TCP errors rate",
+        "unit": "err/s",
+        "queries": [
+          "irate(node_netstat_TcpExt_ListenOverflows{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_TcpExt_ListenDrops{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_TcpExt_TCPSynRetrans{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Tcp_RetransSegs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Tcp_InErrs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Tcp_OutRsts{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "24",
+        "title": "UDP datagrams",
+        "unit": "dat/s",
+        "queries": [
+          "irate(node_netstat_Udp_InDatagrams{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp_OutDatagrams{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp6_InDatagrams{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp6_OutDatagrams{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "25",
+        "title": "UDP errors rate",
+        "unit": "err/s",
+        "queries": [
+          "irate(node_netstat_UdpLite_InErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp_InErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp6_InErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp_NoPorts{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp6_NoPorts{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp_RcvbufErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp6_RcvbufErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp_SndbufErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Udp6_SndbufErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "26",
+        "title": "ICMP messages",
+        "unit": "msg/s",
+        "queries": [
+          "irate(node_netstat_Icmp_InMsgs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Icmp_OutMsgs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Icmp6_InMsgs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Icmp6_OutMsgs{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "27",
+        "title": "ICMP errors rate",
+        "unit": "err/s",
+        "queries": [
+          "irate(node_netstat_Icmp_InErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])",
+          "irate(node_netstat_Icmp6_InErrors{job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nodes",
+    "title": "Linux node / overview",
+    "application": "local",
+    "panels": [
+      {
+        "id": "2",
+        "title": "Uptime",
+        "unit": "dtdurations",
+        "queries": [
+          "time() - node_boot_time_seconds{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Hostname",
+        "unit": "short",
+        "queries": [
+          "node_uname_info{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Kernel version",
+        "unit": "short",
+        "queries": [
+          "node_uname_info{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "OS",
+        "unit": "short",
+        "queries": [
+          "node_os_info{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "CPU count",
+        "unit": "none",
+        "queries": [
+          "count without (cpu) (node_cpu_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", mode=\"idle\"})"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Memory total",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_MemTotal_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Total swap",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_SwapTotal_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Root mount size",
+        "unit": "bytes",
+        "queries": [
+          "node_filesystem_size_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", mountpoint=\"/\", fstype!=\"rootfs\"}"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "CPU usage",
+        "unit": "percent",
+        "queries": [
+          "(((count by (instance) (count(node_cpu_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) by (cpu, instance))) \n- \nsum by (instance) (sum by (instance, mode)(irate(node_cpu_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", mode=~'idle|iowait|steal',job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])))) * 100) \n/ \ncount by(instance) (count(node_cpu_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) by (cpu, instance))\n"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "CPU usage",
+        "unit": "percent",
+        "queries": [
+          "(100 - sum without (mode) (rate(node_cpu_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", mode=~\"idle|iowait|steal\"}[$__rate_interval])) * 100 )\n"
+        ]
+      },
+      {
+        "id": "13",
+        "title": "Load average",
+        "unit": "short",
+        "queries": [
+          "node_load1{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_load5{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_load15{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "count without (cpu) (node_cpu_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", mode=\"idle\"})"
+        ]
+      },
+      {
+        "id": "15",
+        "title": "Memory usage",
+        "unit": "percent",
+        "queries": [
+          "100 -\n(\n  avg by (instance) (node_memory_MemAvailable_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}) /\n  avg by (instance) (node_memory_MemTotal_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"})\n* 100\n)\n"
+        ]
+      },
+      {
+        "id": "16",
+        "title": "Memory usage",
+        "unit": "bytes",
+        "queries": [
+          "(\n  node_memory_MemTotal_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_MemFree_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_Buffers_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n-\n  node_memory_Cached_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}\n)\n",
+          "node_memory_Cached_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_MemAvailable_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_Buffers_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_MemFree_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_memory_MemTotal_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "18",
+        "title": "Disk reads/writes",
+        "unit": "Bps",
+        "queries": [
+          "irate(node_disk_read_bytes_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "irate(node_disk_written_bytes_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])",
+          "irate(node_disk_io_time_seconds_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\", device!=\"\"}[$__rate_interval])"
+        ]
+      },
+      {
+        "id": "19",
+        "title": "Disk space usage",
+        "unit": "bytes",
+        "queries": [
+          "node_filesystem_size_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}",
+          "node_filesystem_avail_bytes{asserts_env=~\"$env\", asserts_site=~\"$site\", fstype!=\"\", mountpoint!=\"\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "21",
+        "title": "Network traffic",
+        "unit": "bps",
+        "queries": [
+          "irate(node_network_receive_bytes_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])*8\n# only show interfaces that had traffic change at least once during selected dashboard interval:\nand\nincrease(\n    node_network_receive_bytes_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__range]\n    ) > 0\n",
+          "irate(node_network_transmit_bytes_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])*8\n# only show interfaces that had traffic change at least once during selected dashboard interval:\nand\nincrease(\n    node_network_transmit_bytes_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__range]\n    ) > 0\n"
+        ]
+      },
+      {
+        "id": "22",
+        "title": "Network errors and dropped packets",
+        "unit": "pps",
+        "queries": [
+          "irate(node_network_transmit_errs_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])>0",
+          "irate(node_network_receive_errs_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])>0",
+          "irate(node_network_transmit_drop_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])>0",
+          "irate(node_network_receive_drop_total{asserts_env=~\"$env\", asserts_site=~\"$site\", job=~\"integrations/(node_exporter|unix)\",cluster=~\"$cluster\",job=~\"$job\",instance=~\"$instance\"}[$__rate_interval])>0"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-application-service-health",
+    "title": "NutsNews Application Service Health",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Application status source",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_app_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "App deployment and route state",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_app_enabled{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_app_container_running{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_app_container_healthy{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_app_public_route_enabled{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_app_public_route_healthy{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_app_staged_route_enabled{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_app_staged_route_healthy{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_app_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "App container resource usage",
+        "unit": "short",
+        "queries": [
+          "nutsnews_docker_container_memory_used_bytes{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\",service=~\"web|caddy\"} or nutsnews_docker_container_cpu_percent{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\",service=~\"web|caddy\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-alert-synthetic",
+    "title": "NutsNews Backend Alert and Synthetic Health",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Grafana Alert State",
+        "unit": "short",
+        "queries": [
+          "ALERTS{alertname=~\"NutsNews.*\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Synthetic Probe Success",
+        "unit": "short",
+        "queries": [
+          "probe_success * on(job, instance, probe, config_version) group_left() sm_check_info{label_service_namespace=\"nutsnews\",label_deployment_environment=\"production\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Synthetic Probe Duration",
+        "unit": "s",
+        "queries": [
+          "probe_duration_seconds * on(job, instance, probe, config_version) group_left() sm_check_info{label_service_namespace=\"nutsnews\",label_deployment_environment=\"production\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Missing Or Down Backend Metrics",
+        "unit": "short",
+        "queries": [
+          "(1 - min(up{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",environment=\"production\",deployment_environment=\"production\",host=\"backend.nutsnews.com\"})) or max(absent(up{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",environment=\"production\",deployment_environment=\"production\",host=\"backend.nutsnews.com\"})) or vector(0)"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Health Audit Available",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backend_health_audit_available{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Health Audit Conclusion",
+        "unit": "short",
+        "queries": [
+          "max by (conclusion) (nutsnews_backend_health_audit_conclusion{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Health Audit Last Run Age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_backend_health_audit_last_run_age_seconds{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Health Audit Last Success Age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_backend_health_audit_last_success_age_seconds{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Health Audit Consecutive Failures",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backend_health_audit_consecutive_failures{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Health Audit Critical Checks",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backend_health_audit_critical_checks{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-backups",
+    "title": "NutsNews Backend Backups",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Backup Stage Healthy",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_backup_stage_healthy{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Latest Snapshot Verified",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_backup_latest_snapshot_verified{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Last Successfully Verified Backup Age",
+        "unit": "s",
+        "queries": [
+          "nutsnews_backend_backup_last_success_age_seconds{job=\"nutsnews-backend-host\"} and on() (max(nutsnews_backend_backup_last_success_age_seconds{job=\"nutsnews-backend-host\"}) >= 0) and on() (max(nutsnews_backend_backup_status_available{job=\"nutsnews-backend-host\"}) == 1)"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Backup Storage Quota Configured",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_backup_storage_quota_configured{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Backup Timers Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_service_active{job=\"nutsnews-backend-host\",unit=~\"nutsnews-backup.*timer|nutsnews-restore-drill.timer\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-caddy-edge",
+    "title": "NutsNews Backend Caddy and Edge",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Caddy Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_service_active{job=\"nutsnews-backend-host\",unit=\"caddy\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Public Readiness",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_public_endpoint_ready{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Terminal Request Rate",
+        "unit": "reqps",
+        "queries": [
+          "sum(rate(caddy_http_requests_total{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m]))"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "4xx Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "(sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\",code=~\"4..\"}[5m])) / sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m]))) and on() (sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])) > 0)"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "429 Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "(sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\",code=\"429\"}[5m])) / sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m]))) and on() (sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])) > 0)"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "5xx Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "(sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\",code=~\"5..\"}[5m])) / sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m]))) and on() (sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])) > 0)"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Caddy p95 Latency",
+        "unit": "s",
+        "queries": [
+          "histogram_quantile(0.95, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])))"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Caddy p99 Latency",
+        "unit": "s",
+        "queries": [
+          "histogram_quantile(0.99, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])))"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Upstream And Middleware Error Rate",
+        "unit": "ops",
+        "queries": [
+          "(sum(rate(caddy_http_request_errors_total{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])) or on() (0 * sum(rate(caddy_http_request_duration_seconds_count{job=\"nutsnews-backend-caddy\",handler=\"subroute\"}[5m])))) and on() (max(up{job=\"nutsnews-backend-caddy\"}) == 1)"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Upstream Health",
+        "unit": "short",
+        "queries": [
+          "min by (upstream) (caddy_reverse_proxy_upstreams_healthy{job=\"nutsnews-backend-caddy\"}) or on() label_replace(vector(-1), \"upstream\", \"disabled_by_configuration\", \"\", \"\")"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "External Readiness Probe",
+        "unit": "short",
+        "queries": [
+          "min(probe_success{job=\"nutsnews-backend-caddy-tls\",probe=\"tls\",check=\"certificate\"})"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "TLS Certificate Time Remaining",
+        "unit": "s",
+        "queries": [
+          "min(probe_ssl_earliest_cert_expiry{job=\"nutsnews-backend-caddy-tls\",probe=\"tls\",check=\"certificate\"}) - time()"
+        ]
+      },
+      {
+        "id": "13",
+        "title": "Failed Units",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_failed_systemd_units{job=\"nutsnews-backend-host\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-docker-runtime",
+    "title": "NutsNews Backend Docker and Runtime",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Docker Service Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_service_active{job=\"nutsnews-backend-host\",unit=\"docker\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Containerd Service Active",
+        "unit": "short",
+        "queries": [
+          "node_systemd_unit_state{job=\"nutsnews-backend-host\",name=\"containerd.service\",state=\"active\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Backend Units",
+        "unit": "short",
+        "queries": [
+          "node_systemd_unit_state{job=\"nutsnews-backend-host\",name=~\"nutsnews-.+\",state=\"active\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Unit Restarts",
+        "unit": "short",
+        "queries": [
+          "increase(node_systemd_service_restart_total{job=\"nutsnews-backend-host\",name=~\"docker.service|containerd.service|nutsnews-.+\"}[24h])"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-host",
+    "title": "NutsNews Backend Host Overview",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "CPU Busy",
+        "unit": "percentunit",
+        "queries": [
+          "1 - avg(rate(node_cpu_seconds_total{job=\"nutsnews-backend-host\",mode=\"idle\"}[5m]))"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Load Per CPU",
+        "unit": "short",
+        "queries": [
+          "node_load1{job=\"nutsnews-backend-host\"} / count(count by (cpu) (node_cpu_seconds_total{job=\"nutsnews-backend-host\",mode=\"idle\"}))"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Memory Used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_memory_MemAvailable_bytes{job=\"nutsnews-backend-host\"} / node_memory_MemTotal_bytes{job=\"nutsnews-backend-host\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Swap Used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_memory_SwapFree_bytes{job=\"nutsnews-backend-host\"} / node_memory_SwapTotal_bytes{job=\"nutsnews-backend-host\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Root Disk Used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_filesystem_avail_bytes{job=\"nutsnews-backend-host\",mountpoint=\"/\",fstype!=\"\"} / node_filesystem_size_bytes{job=\"nutsnews-backend-host\",mountpoint=\"/\",fstype!=\"\"})"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Root Inodes Used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_filesystem_files_free{job=\"nutsnews-backend-host\",mountpoint=\"/\"} / node_filesystem_files{job=\"nutsnews-backend-host\",mountpoint=\"/\"})"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Network Receive",
+        "unit": "Bps",
+        "queries": [
+          "sum by (device) (rate(node_network_receive_bytes_total{job=\"nutsnews-backend-host\",device!~\"lo|veth.*|docker.*\"}[5m]))"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Network Transmit",
+        "unit": "Bps",
+        "queries": [
+          "sum by (device) (rate(node_network_transmit_bytes_total{job=\"nutsnews-backend-host\",device!~\"lo|veth.*|docker.*\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-logs",
+    "title": "NutsNews Backend Logs",
+    "application": "nutsnews",
+    "panels": []
+  },
+  {
+    "id": "nutsnews-backend-metrics-quota",
+    "title": "NutsNews Backend Metrics Quota",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Series Count By Metric",
+        "unit": "short",
+        "queries": [
+          "topk(20, count by (__name__) ({job=\"nutsnews-backend-host\"}))"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Unique Metric Names",
+        "unit": "short",
+        "queries": [
+          "count(count by (__name__) ({job=\"nutsnews-backend-host\"}))"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Alloy Remote Write Pending Samples",
+        "unit": "short",
+        "queries": [
+          "prometheus_remote_storage_samples_pending{job=\"nutsnews-backend-alloy\",instance=\"backend.nutsnews.com\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Alloy Remote Write Failed Samples",
+        "unit": "short",
+        "queries": [
+          "increase(prometheus_remote_storage_samples_failed_total{job=\"nutsnews-backend-alloy\",instance=\"backend.nutsnews.com\"}[1h])"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-os-updates",
+    "title": "NutsNews Backend OS Updates",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Reboot Required",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_reboot_required{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Upgradable Packages",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_upgradable_packages{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Boot Time",
+        "unit": "dateTimeAsIso",
+        "queries": [
+          "node_boot_time_seconds{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Uptime",
+        "unit": "s",
+        "queries": [
+          "time() - node_boot_time_seconds{job=\"nutsnews-backend-host\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-postgres-failover",
+    "title": "NutsNews Backend PostgreSQL Failover",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "PostgreSQL Service Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_service_active{job=\"nutsnews-backend-host\",unit=\"postgresql\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Failover Restore Ready",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_postgres_failover_ready{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Restore Drill Healthy",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_postgres_restore_drill_healthy{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Replication Lag Configured",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_postgres_replication_lag_configured{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Sync Relay Available",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_backend_sync_relay_available{job=\"nutsnews-backend-host\"} and on() max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status!=\"not_configured\"})) or (-1 * max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status=\"not_configured\"}))"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Sync Relay Configuration State",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Sync Relay Expected Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_sync_relay_expected_active{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Sync Relay Collector Fresh",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_backend_sync_relay_collector_fresh{job=\"nutsnews-backend-host\"} and on() max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status!=\"not_configured\"})) or (-1 * max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status=\"not_configured\"}))"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Sync Relay Healthy",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_backend_sync_relay_healthy{job=\"nutsnews-backend-host\"} and on() max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status!=\"not_configured\"})) or (-1 * max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status=\"not_configured\"}))"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Sync Relay Real Lag",
+        "unit": "s",
+        "queries": [
+          "(nutsnews_backend_sync_relay_lag_seconds{job=\"nutsnews-backend-host\"} and on() (nutsnews_backend_sync_relay_lag_seconds{job=\"nutsnews-backend-host\"} >= 0) and on() max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status!=\"not_configured\"})) or (-1 * max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status=\"not_configured\"}))"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Sync Relay Failed Tables",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_backend_sync_relay_failed_table_count{job=\"nutsnews-backend-host\"} and on() (nutsnews_backend_sync_relay_failed_table_count{job=\"nutsnews-backend-host\"} >= 0) and on() max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status!=\"not_configured\"})) or (-1 * max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status=\"not_configured\"}))"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Sync Relay Last Success Age",
+        "unit": "s",
+        "queries": [
+          "(nutsnews_backend_sync_relay_last_success_age_seconds{job=\"nutsnews-backend-host\"} and on() (nutsnews_backend_sync_relay_last_success_age_seconds{job=\"nutsnews-backend-host\"} >= 0) and on() max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status!=\"not_configured\"})) or (-1 * max(nutsnews_backend_sync_relay_status{job=\"nutsnews-backend-host\",status=\"not_configured\"}))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-postgres-operations",
+    "title": "NutsNews Backend PostgreSQL Operations",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "PostgreSQL Exporter Up",
+        "unit": "short",
+        "queries": [
+          "pg_up{job=\"nutsnews-backend-postgres\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Connections By Database",
+        "unit": "short",
+        "queries": [
+          "sum by (datname) (pg_stat_database_numbackends{job=\"nutsnews-backend-postgres\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Transactions",
+        "unit": "ops",
+        "queries": [
+          "sum by (datname) (rate(pg_stat_database_xact_commit{job=\"nutsnews-backend-postgres\"}[5m])) + sum by (datname) (rate(pg_stat_database_xact_rollback{job=\"nutsnews-backend-postgres\"}[5m]))"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Locks By Mode",
+        "unit": "short",
+        "queries": [
+          "sum by (datname, mode) (pg_locks_count{job=\"nutsnews-backend-postgres\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Deadlocks",
+        "unit": "ops",
+        "queries": [
+          "sum by (datname) (rate(pg_stat_database_deadlocks{job=\"nutsnews-backend-postgres\"}[5m]))"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Cache Hit Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "(sum by (datname) (rate(pg_stat_database_blks_hit{job=\"nutsnews-backend-postgres\"}[5m])) / (sum by (datname) (rate(pg_stat_database_blks_hit{job=\"nutsnews-backend-postgres\"}[5m])) + sum by (datname) (rate(pg_stat_database_blks_read{job=\"nutsnews-backend-postgres\"}[5m])))) and on(datname) ((sum by (datname) (rate(pg_stat_database_blks_hit{job=\"nutsnews-backend-postgres\"}[5m])) + sum by (datname) (rate(pg_stat_database_blks_read{job=\"nutsnews-backend-postgres\"}[5m]))) > 0)"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Checkpoints And Buffers",
+        "unit": "ops",
+        "queries": [
+          "(sum(rate(pg_stat_bgwriter_checkpoints_timed_total{job=\"nutsnews-backend-postgres\"}[5m])) or sum(rate(pg_stat_checkpointer_num_timed_total{job=\"nutsnews-backend-postgres\"}[5m]))) + sum(rate(pg_stat_bgwriter_buffers_alloc_total{job=\"nutsnews-backend-postgres\"}[5m]))"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Dead Tuples Awaiting Vacuum",
+        "unit": "short",
+        "queries": [
+          "sum by (schemaname, relname) (pg_stat_user_tables_n_dead_tup{job=\"nutsnews-backend-postgres\"})"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Autovacuum Activity",
+        "unit": "short",
+        "queries": [
+          "(pg_stat_activity_autovacuum_timestamp_seconds{job=\"nutsnews-backend-postgres\"} or pg_stat_progress_vacuum_heap_blks{job=\"nutsnews-backend-postgres\"} or pg_stat_progress_vacuum_heap_blks_scanned{job=\"nutsnews-backend-postgres\"} or pg_stat_progress_vacuum_heap_blks_vacuumed{job=\"nutsnews-backend-postgres\"}) or on() label_replace(((0 * (max(pg_up{job=\"nutsnews-backend-postgres\"}) == 1)) - 1), \"activity\", \"idle\", \"\", \"\")"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Database Storage",
+        "unit": "bytes",
+        "queries": [
+          "sum by (datname) (pg_database_size_bytes{job=\"nutsnews-backend-postgres\"})"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "WAL Growth",
+        "unit": "Bps",
+        "queries": [
+          "clamp_min(deriv(pg_wal_size_bytes{job=\"nutsnews-backend-postgres\"}[15m]), 0)"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Replication State And Lag",
+        "unit": "short",
+        "queries": [
+          "((pg_replication_lag_seconds{job=\"nutsnews-backend-postgres\"} or pg_replication_slots_active{job=\"nutsnews-backend-postgres\"} or pg_replication_slots_slot_is_active{job=\"nutsnews-backend-postgres\"} or pg_replication_slots_pg_wal_lsn_diff{job=\"nutsnews-backend-postgres\"}) and on() (max(nutsnews_backend_postgres_replication_lag_configured{job=\"nutsnews-backend-host\"}) == 1)) or on() label_replace(((0 * (max(nutsnews_backend_postgres_replication_lag_configured{job=\"nutsnews-backend-host\"}) == 0)) - 1), \"replication_state\", \"disabled_by_configuration\", \"\", \"\")"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backend-service-health",
+    "title": "NutsNews Backend Service Health",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Core Service Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_service_active{job=\"nutsnews-backend-host\",unit=~\"ssh|ufw|fail2ban|caddy|alloy|sysstat\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "NutsNews Timers Active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_service_active{job=\"nutsnews-backend-host\",unit=~\"nutsnews-.+timer\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Systemd Active State",
+        "unit": "short",
+        "queries": [
+          "node_systemd_unit_state{job=\"nutsnews-backend-host\",name=~\"ssh.service|ufw.service|fail2ban.service|caddy.service|alloy.service|sysstat.service|nutsnews-.+\",state=\"active\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Host Up",
+        "unit": "short",
+        "queries": [
+          "up{job=\"nutsnews-backend-host\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Compatibility API Up",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_api_up{job=\"nutsnews-backend-api\"}"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "API PostgreSQL Readiness",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_api_dependency_ready{job=\"nutsnews-backend-api\",dependency=\"postgresql\"}"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "API Request Rate",
+        "unit": "reqps",
+        "queries": [
+          "sum by (operation, method) (rate(nutsnews_backend_api_requests_total{job=\"nutsnews-backend-api\"}[5m]))"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "API Error Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "(sum(rate(nutsnews_backend_api_request_errors_total{job=\"nutsnews-backend-api\"}[5m])) / sum(rate(nutsnews_backend_api_requests_total{job=\"nutsnews-backend-api\"}[5m]))) and on() (sum(rate(nutsnews_backend_api_requests_total{job=\"nutsnews-backend-api\"}[5m])) > 0)"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "API p95 Latency",
+        "unit": "s",
+        "queries": [
+          "histogram_quantile(0.95, sum by (le, operation) (rate(nutsnews_backend_api_request_duration_seconds_bucket{job=\"nutsnews-backend-api\"}[5m])))"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "API p99 Latency",
+        "unit": "s",
+        "queries": [
+          "histogram_quantile(0.99, sum by (le, operation) (rate(nutsnews_backend_api_request_duration_seconds_bucket{job=\"nutsnews-backend-api\"}[5m])))"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "API Write Mode",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_api_write_mode{job=\"nutsnews-backend-api\"}"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "API Build Identity",
+        "unit": "short",
+        "queries": [
+          "nutsnews_backend_api_build_info{job=\"nutsnews-backend-api\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-backups-restore-verification",
+    "title": "NutsNews Backups Restore Verification",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Backup status source",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backup_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Backup latest snapshot age",
+        "unit": "s",
+        "queries": [
+          "nutsnews_backup_latest_snapshot_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} and on() (max(nutsnews_backup_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Last successful verification age",
+        "unit": "s",
+        "queries": [
+          "nutsnews_backup_last_verify_finished_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} and on() (max(nutsnews_backup_last_verify_finished_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) >= 0) and on() (max(nutsnews_backup_last_verify_success{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1) and on() (max(nutsnews_backup_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Backup success state",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_backup_last_success{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_backup_last_prune_success{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_backup_last_verify_success{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_backup_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Backup config and missing paths",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_backup_configured{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_backup_missing_configuration_total{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_backup_missing_paths_total{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_backup_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-cpu-load-processes",
+    "title": "NutsNews CPU Load Processes",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "CPU busy",
+        "unit": "percentunit",
+        "queries": [
+          "1 - avg by (instance) (rate(node_cpu_seconds_total{job=~\"integrations/unix\", instance=~\"$instance\",mode=\"idle\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Load averages",
+        "unit": "short",
+        "queries": [
+          "node_load1{job=~\"integrations/unix\", instance=~\"$instance\"}",
+          "node_load5{job=~\"integrations/unix\", instance=~\"$instance\"}",
+          "node_load15{job=~\"integrations/unix\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Process counts",
+        "unit": "short",
+        "queries": [
+          "node_processes_state{job=~\"integrations/unix\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Clock offset",
+        "unit": "s",
+        "queries": [
+          "node_timex_offset_seconds{job=~\"integrations/unix\", instance=~\"$instance\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-production-ownership",
+    "title": "NutsNews Current Production Ownership",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Web target",
+        "unit": "short",
+        "queries": [
+          "max by (web_target) (nutsnews_production_ownership_info{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) and on() (max(nutsnews_production_ownership_available{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) == 1) and on() ((time() - max(nutsnews_production_ownership_last_success_timestamp_seconds{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"})) < 300)"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Database provider",
+        "unit": "short",
+        "queries": [
+          "max by (database_provider) (nutsnews_production_ownership_info{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) and on() (max(nutsnews_production_ownership_available{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) == 1) and on() ((time() - max(nutsnews_production_ownership_last_success_timestamp_seconds{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"})) < 300)"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Ingestion owner",
+        "unit": "short",
+        "queries": [
+          "max by (ingestion_owner) (nutsnews_backend_worker_uplift_deployment_info{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) and on() (max(nutsnews_backend_worker_uplift_ownership_available{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) == 1) and on() ((time() - max(nutsnews_backend_metric_scrape_timestamp_seconds{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"})) < 600) and on() (max(nutsnews_backend_metric_exporter_available{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) == 1)"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Worker-uplift mode and write gate",
+        "unit": "short",
+        "queries": [
+          "max by (mode, write_gate) (nutsnews_backend_worker_uplift_deployment_info{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) and on() (max(nutsnews_backend_worker_uplift_ownership_available{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) == 1) and on() ((time() - max(nutsnews_backend_metric_scrape_timestamp_seconds{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"})) < 600) and on() (max(nutsnews_backend_metric_exporter_available{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) == 1)"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Web and infrastructure revisions",
+        "unit": "short",
+        "queries": [
+          "max by (web_revision, infra_revision) (nutsnews_production_ownership_info{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) and on() (max(nutsnews_production_ownership_available{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) == 1) and on() ((time() - max(nutsnews_production_ownership_last_success_timestamp_seconds{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"})) < 300)"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Backend API revision",
+        "unit": "short",
+        "queries": [
+          "max by (service, service_version, revision) (nutsnews_backend_api_build_info{job=\"nutsnews-backend-api\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\"})"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Deployed worker release and image identities",
+        "unit": "short",
+        "queries": [
+          "max by (worker_service, service_version, revision, image_digest) (nutsnews_backend_worker_uplift_deployed_service_info{job=\"nutsnews-backend-host\",service=\"host\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\",host=\"backend.nutsnews.com\"}) and on() (max(nutsnews_backend_worker_uplift_deployed_identity_available{job=\"nutsnews-backend-host\",service=\"host\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\",host=\"backend.nutsnews.com\"}) == 1)"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Worker runtime deployment identities",
+        "unit": "short",
+        "queries": [
+          "max by (service, deployment, adapter) (nutsnews_worker_deployment_info{job=\"nutsnews-worker-uplift\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\"})"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Worker readiness by ownership mode",
+        "unit": "short",
+        "queries": [
+          "(max by (service) (nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\",probe=\"readiness\",outcome=\"ok\"}) and on(service) (max by (service) (nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\"}) == 1)) or (((0 * max by (service) (nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\"})) - 1) and on(service) (max by (service) (nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",deployment_environment=\"production\",instance=\"backend.nutsnews.com\"}) == 0))"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Ownership telemetry available",
+        "unit": "short",
+        "queries": [
+          "(max(nutsnews_production_ownership_available{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"}) or vector(0)) * (max(nutsnews_backend_worker_uplift_ownership_available{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) or vector(0)) * (max(nutsnews_backend_metric_exporter_available{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"}) or vector(0)) * (((time() - max(nutsnews_production_ownership_last_success_timestamp_seconds{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"})) < bool 300) or vector(0)) * (((time() - max(nutsnews_backend_metric_scrape_timestamp_seconds{job=\"nutsnews-backend-host\",instance=\"backend.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host\",host=\"backend.nutsnews.com\",environment=\"production\",deployment_environment=\"production\"})) < bool 600) or vector(0))"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Ownership telemetry freshness",
+        "unit": "s",
+        "queries": [
+          "time() - max(nutsnews_production_ownership_last_success_timestamp_seconds{job=\"integrations/unix\",instance=\"vps.nutsnews.com\",service_namespace=\"nutsnews\",service=\"host-exporter\",host=\"vps.nutsnews.com\",deployment_environment=\"production\"} > 0)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-disk-filesystem-io",
+    "title": "NutsNews Disk Filesystem IO",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Filesystem used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_filesystem_avail_bytes{job=~\"integrations/unix\", instance=~\"$instance\",fstype!=\"\"} / node_filesystem_size_bytes{job=~\"integrations/unix\", instance=~\"$instance\",fstype!=\"\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Inodes used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_filesystem_files_free{job=~\"integrations/unix\", instance=~\"$instance\",fstype!=\"\"} / node_filesystem_files{job=~\"integrations/unix\", instance=~\"$instance\",fstype!=\"\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Disk read/write throughput",
+        "unit": "Bps",
+        "queries": [
+          "sum by (instance, device) (rate(node_disk_read_bytes_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m]) + rate(node_disk_written_bytes_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m]))"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Disk IO time",
+        "unit": "percentunit",
+        "queries": [
+          "rate(node_disk_io_time_seconds_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m])"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-docker-compose-containers",
+    "title": "NutsNews Docker Compose Containers",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Docker stats availability",
+        "unit": "short",
+        "queries": [
+          "nutsnews_docker_stats_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Container CPU",
+        "unit": "percent",
+        "queries": [
+          "nutsnews_docker_container_cpu_percent{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Container memory",
+        "unit": "bytes",
+        "queries": [
+          "nutsnews_docker_container_memory_used_bytes{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Container network IO",
+        "unit": "bytes",
+        "queries": [
+          "nutsnews_docker_container_network_receive_bytes{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_docker_container_network_transmit_bytes{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Container block IO",
+        "unit": "bytes",
+        "queries": [
+          "nutsnews_docker_container_block_read_bytes{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_docker_container_block_write_bytes{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Container restarts and health",
+        "unit": "short",
+        "queries": [
+          "nutsnews_docker_container_restart_count{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_docker_container_healthy{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_docker_container_running{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-grafana-cloud-usage-quota",
+    "title": "NutsNews Grafana Cloud Usage Quota",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Metrics usage versus live active-series limit",
+        "unit": "percentunit",
+        "queries": [
+          "max(grafanacloud_instance_active_series / on(id) grafanacloud_instance_metrics_limits{limit_name=\"max_global_series_per_user\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Projected Synthetic Monitoring API executions",
+        "unit": "percentunit",
+        "queries": [
+          "vector(0.6912)"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Logs active streams versus live stream limit",
+        "unit": "percentunit",
+        "queries": [
+          "max(grafanacloud_logs_instance_active_streams) / max(grafanacloud_logs_instance_limits{limit_name=\"max_global_streams_per_user\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Logs ingest rate versus live rate limit",
+        "unit": "percentunit",
+        "queries": [
+          "max(grafanacloud_logs_instance_bytes_received_per_second) / (max(grafanacloud_logs_instance_limits{limit_name=\"ingestion_rate_mb\"}) * 1024 * 1024)"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Traces ingest (Tempo deferred)",
+        "unit": "short",
+        "queries": [
+          "vector(-1)"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Published Grafana Cloud limits",
+        "unit": "short",
+        "queries": [
+          "grafanacloud_instance_metrics_limits or grafanacloud_logs_instance_limits or grafanacloud_traces_instance_limits"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-logs-overview",
+    "title": "NutsNews Logs Overview",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "8",
+        "title": "Dropped log guardrails",
+        "unit": "ops",
+        "queries": [
+          "sum by (reason) (rate(loki_process_dropped_lines_total{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}[$__rate_interval]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-logs-security-auth",
+    "title": "NutsNews Logs Security Auth",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Recent failed logins",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_security_failed_logins_recent{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_security_failed_logins_invalid_user{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_security_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Dropped log guardrail counters",
+        "unit": "ops",
+        "queries": [
+          "sum by (reason) (rate(loki_process_dropped_lines_total{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-memory-swap",
+    "title": "NutsNews Memory Swap",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Memory used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - (node_memory_MemAvailable_bytes{job=~\"integrations/unix\", instance=~\"$instance\"} / node_memory_MemTotal_bytes{job=~\"integrations/unix\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Memory available",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_MemAvailable_bytes{job=~\"integrations/unix\", instance=~\"$instance\"}"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Swap used",
+        "unit": "percentunit",
+        "queries": [
+          "1 - ((node_memory_SwapFree_bytes{job=~\"integrations/unix\", instance=~\"$instance\"} + node_memory_SwapCached_bytes{job=~\"integrations/unix\", instance=~\"$instance\"}) / node_memory_SwapTotal_bytes{job=~\"integrations/unix\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Ops snapshot memory",
+        "unit": "percent",
+        "queries": [
+          "nutsnews_resource_memory_used_percent{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} and on() (max(nutsnews_resource_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-network-caddy-edge",
+    "title": "NutsNews Network Caddy Edge",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Network receive",
+        "unit": "Bps",
+        "queries": [
+          "sum by (instance, device) (rate(node_network_receive_bytes_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m]))"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Network transmit",
+        "unit": "Bps",
+        "queries": [
+          "sum by (instance, device) (rate(node_network_transmit_bytes_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m]))"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Network errors",
+        "unit": "ops",
+        "queries": [
+          "sum by (instance, device) (rate(node_network_receive_errs_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m]) + rate(node_network_transmit_errs_total{job=~\"integrations/unix\", instance=~\"$instance\"}[5m]))"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Caddy request rate",
+        "unit": "reqps",
+        "queries": [
+          "sum(rate(caddy_http_requests_total{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Caddy error and throttle ratios",
+        "unit": "percentunit",
+        "queries": [
+          "(sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\",code=~\"4..\"}[$__rate_interval])) / sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval]))) and on() (sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval])) > 0)",
+          "(sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\",code=\"429\"}[$__rate_interval])) / sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval]))) and on() (sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval])) > 0)",
+          "(sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\",code=~\"5..\"}[$__rate_interval])) / sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval]))) and on() (sum(rate(caddy_http_request_duration_seconds_count{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval])) > 0)"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Caddy request latency",
+        "unit": "s",
+        "queries": [
+          "histogram_quantile(0.95, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval])))",
+          "histogram_quantile(0.99, sum by (le) (rate(caddy_http_request_duration_seconds_bucket{deployment_environment=~\"$environment\",service=\"caddy\",handler=\"subroute\"}[$__rate_interval])))"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Caddy upstream health",
+        "unit": "short",
+        "queries": [
+          "min by (upstream) (caddy_reverse_proxy_upstreams_healthy{deployment_environment=~\"$environment\",service=\"caddy\"})"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "TLS certificate expiry",
+        "unit": "s",
+        "queries": [
+          "min(nutsnews_caddy_tls_certificate_expiry_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\",service=\"caddy\"})"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-ops-portal-reporting",
+    "title": "NutsNews Ops Portal Reporting",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Ops Portal status readable",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_ops_portal_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Status snapshot age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_ops_portal_status_generated_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Email reporting state",
+        "unit": "short",
+        "queries": [
+          "(nutsnews_email_reporting_enabled{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_email_reporting_configured{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_email_reporting_pending_alerts{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} or nutsnews_email_reporting_suppressed_alerts{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_email_reporting_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Latest health-audit conclusion",
+        "unit": "short",
+        "queries": [
+          "max by (outcome) (nutsnews_email_reporting_last_report_conclusion{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_email_reporting_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Last critical-free health-audit success age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_email_reporting_last_report_success_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_email_reporting_last_report_success_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) >= 0) and on() (max(nutsnews_email_reporting_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Last report-delivery success age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_email_reporting_last_report_delivery_success_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_email_reporting_last_report_delivery_success_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) >= 0) and on() (max(nutsnews_email_reporting_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Latest health-audit exit code",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_email_reporting_last_report_exit_code{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_email_reporting_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-synthetic-uptime-api-checks",
+    "title": "NutsNews Synthetic Uptime API Checks",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Synthetic success",
+        "unit": "percentunit",
+        "queries": [
+          "avg by (job, probe) (probe_success * on(job, instance, probe, config_version) group_left() sm_check_info{label_service_namespace=\"nutsnews\",label_deployment_environment=~\"$environment\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Synthetic duration",
+        "unit": "s",
+        "queries": [
+          "avg by (job, probe) (probe_duration_seconds * on(job, instance, probe, config_version) group_left() sm_check_info{label_service_namespace=\"nutsnews\",label_deployment_environment=~\"$environment\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "HTTP status code",
+        "unit": "short",
+        "queries": [
+          "max by (job, probe) (probe_http_status_code * on(job, instance, probe, config_version) group_left() sm_check_info{label_service_namespace=\"nutsnews\",label_deployment_environment=~\"$environment\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Synthetic HTTP phase duration",
+        "unit": "s",
+        "queries": [
+          "avg by (job, probe, phase) (probe_http_duration_seconds * on(job, instance, probe, config_version) group_left() sm_check_info{label_service_namespace=\"nutsnews\",label_deployment_environment=~\"$environment\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Scheduled Inventory Audit Conclusion",
+        "unit": "short",
+        "queries": [
+          "max by (outcome) (nutsnews_synthetic_inventory_audit_conclusion{deployment_environment=~\"$environment\"})"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Scheduled Inventory Audit Last Success Age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_synthetic_inventory_audit_last_success_age_seconds{deployment_environment=~\"$environment\"})"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-systemd-services-timers",
+    "title": "NutsNews Systemd Services Timers",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Systemd active state",
+        "unit": "short",
+        "queries": [
+          "node_systemd_unit_state{job=~\"integrations/unix\", instance=~\"$instance\",state=\"active\"}"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "NutsNews service active",
+        "unit": "short",
+        "queries": [
+          "nutsnews_systemd_service_active{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"} and on() (max(nutsnews_systemd_service_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Systemd restarts",
+        "unit": "short",
+        "queries": [
+          "node_systemd_service_restart_total{job=~\"integrations/unix\", instance=~\"$instance\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-vps-overview",
+    "title": "NutsNews VPS Overview",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Host scrape availability",
+        "unit": "percentunit",
+        "queries": [
+          "avg(up{job=~\"integrations/unix\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Ops Portal status age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_ops_portal_status_generated_age_seconds{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Active alerts by level",
+        "unit": "short",
+        "queries": [
+          "sum by (level) (nutsnews_alerts_total{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) and on() (max(nutsnews_alert_status_available{service_namespace=\"nutsnews\", deployment_environment=~\"$environment\", instance=~\"$instance\"}) == 1)"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-worker-pipeline-run-drilldown",
+    "title": "NutsNews Worker Pipeline Run Drilldown",
+    "application": "nutsnews",
+    "panels": []
+  },
+  {
+    "id": "nutsnews-worker-uplift-slos",
+    "title": "NutsNews Worker-Uplift Pipeline SLOs",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Broker Availability SLI",
+        "unit": "percentunit",
+        "queries": [
+          "min(up{job=~\"nutsnews-rabbitmq|nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Canary Success",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backend_rabbitmq_canary_success{environment=~\"$environment\",instance=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Canary Latency",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_backend_rabbitmq_canary_latency_seconds{environment=~\"$environment\",instance=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Canary Message Age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_backend_rabbitmq_canary_message_age_seconds{environment=~\"$environment\",instance=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Stage Success Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "((sum by (service) (rate(nutsnews_worker_uplift_stage_events_total{environment=~\"$environment\",service=~\"$service\",outcome=~\"success|duplicate\"}[$__rate_interval])) / sum by (service) (rate(nutsnews_worker_uplift_stage_events_total{environment=~\"$environment\",service=~\"$service\",outcome=~\"success|duplicate|invalid|failure|dlq\"}[$__rate_interval]))) and on(service) (sum by (service) (rate(nutsnews_worker_uplift_stage_events_total{environment=~\"$environment\",service=~\"$service\",outcome=~\"success|duplicate|invalid|failure|dlq\"}[$__rate_interval])) > 0)) or on() label_replace(vector(-1), \"service\", \"no_terminal_events\", \"\", \"\")"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Stage P95 Latency",
+        "unit": "s",
+        "queries": [
+          "(histogram_quantile(0.95, sum by (le, service) (rate(nutsnews_worker_uplift_stage_latency_seconds_bucket{environment=~\"$environment\",service=~\"$service\"}[$__rate_interval]))) and on(service) (sum by (service) (rate(nutsnews_worker_uplift_stage_latency_seconds_count{environment=~\"$environment\",service=~\"$service\"}[$__rate_interval])) > 0)) or on(service) (((0 * max by (service) (nutsnews_worker_uplift_stage_latency_seconds_count{environment=~\"$environment\",service=~\"$service\"})) - 1) unless on(service) (sum by (service) (rate(nutsnews_worker_uplift_stage_latency_seconds_count{environment=~\"$environment\",service=~\"$service\"}[$__rate_interval])) > 0))"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Retry And DLQ Budget Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "((((sum(rate(rabbitmq_detailed_queue_messages_redelivered_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",queue=~\"$queue\"}[$__rate_interval])) or vector(0)) + ((sum(rabbitmq_detailed_queue_messages_ready{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",queue=~\".*\\\\.dlq$\"}) or vector(0)) / 60)) / sum(rate(rabbitmq_detailed_queue_messages_acked_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",queue=~\"$queue\"}[$__rate_interval]))) and on() (sum(rate(rabbitmq_detailed_queue_messages_acked_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",queue=~\"$queue\"}[$__rate_interval])) > 0)) or vector(-1)"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Publication Success Ratio",
+        "unit": "percentunit",
+        "queries": [
+          "((sum(rate(nutsnews_worker_uplift_stage_events_total{environment=~\"$environment\",service=\"publication\",outcome=~\"success|duplicate\"}[$__rate_interval])) / sum(rate(nutsnews_worker_uplift_stage_events_total{environment=~\"$environment\",service=\"publication\",outcome=~\"success|duplicate|invalid|failure|dlq\"}[$__rate_interval]))) and on() (sum(rate(nutsnews_worker_uplift_stage_events_total{environment=~\"$environment\",service=\"publication\",outcome=~\"success|duplicate|invalid|failure|dlq\"}[$__rate_interval])) > 0)) or vector(-1)"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Newest Published Content Age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_backend_public_feed_snapshot_newest_content_age_seconds{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"}) and on() (max(nutsnews_backend_public_feed_snapshot_newest_content_age_seconds{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"}) >= 0) and on() (max(nutsnews_backend_content_coverage_available{job=\"nutsnews-backend-host\",deployment_environment=~\"$environment\",host=~\"$host\"}) == 1)"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Worker-Uplift Alert State",
+        "unit": "short",
+        "queries": [
+          "ALERTS{alertname=~\"NutsNews worker-uplift.*\"} or vector(0)"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Canary Fixture Signal",
+        "unit": "short",
+        "queries": [
+          "max by (failure_class) (nutsnews_backend_rabbitmq_canary_failure_fixture{job=\"nutsnews-backend-host\",instance=~\"$host\",service_namespace=\"nutsnews\",service=\"host\",environment=~\"$environment\",deployment_environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "RabbitMQ Recovery Proof Age",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_backend_rabbitmq_definition_export_age_seconds{environment=~\"$environment\",instance=~\"$host\"})"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-worker-uplift-rabbitmq-queues",
+    "title": "NutsNews Worker-Uplift Queue Drilldown",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Selected Queue Depth",
+        "unit": "short",
+        "queries": [
+          "sum by (queue) (rabbitmq_detailed_queue_messages{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Ready By Queue",
+        "unit": "short",
+        "queries": [
+          "sum by (queue) (rabbitmq_detailed_queue_messages_ready{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Unacked By Queue",
+        "unit": "short",
+        "queries": [
+          "sum by (queue) (rabbitmq_detailed_queue_messages_unacked{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Consumer Count By Queue",
+        "unit": "short",
+        "queries": [
+          "sum by (queue) (rabbitmq_detailed_queue_consumers{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Consumer Utilisation By Queue",
+        "unit": "percentunit",
+        "queries": [
+          "avg by (queue) (rabbitmq_detailed_queue_consumer_utilisation{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Consumer Capacity By Queue",
+        "unit": "percentunit",
+        "queries": [
+          "avg by (queue) (rabbitmq_detailed_queue_consumer_capacity{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Deliver Rate By Queue",
+        "unit": "ops",
+        "queries": [
+          "sum by (queue) (rate(rabbitmq_detailed_queue_messages_delivered_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "Ack Rate By Queue",
+        "unit": "ops",
+        "queries": [
+          "sum by (queue) (rate(rabbitmq_detailed_queue_messages_acked_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Retry Queue Depth",
+        "unit": "short",
+        "queries": [
+          "sum by (queue) (rabbitmq_detailed_queue_messages_ready{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\".*\\\\.retry-(30s|5m|30m)$\"})"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "DLQ Queue Depth",
+        "unit": "short",
+        "queries": [
+          "sum by (queue) (rabbitmq_detailed_queue_messages_ready{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\".*\\\\.dlq$\"})"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-worker-uplift-rabbitmq-overview",
+    "title": "NutsNews Worker-Uplift RabbitMQ Overview",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "Broker Scrape Up",
+        "unit": "short",
+        "queries": [
+          "max(up{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "Queue Metrics Scrape Up",
+        "unit": "short",
+        "queries": [
+          "max(up{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "Ready Messages Total",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_detailed_queue_messages_ready{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "Unacked Messages Total",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_detailed_queue_messages_unacked{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "Ingress Publish Rate",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(rabbitmq_queue_messages_published_total{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "Egress Ack Rate",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(rabbitmq_detailed_queue_messages_acked_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "Redelivery Rate",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(rabbitmq_detailed_queue_messages_redelivered_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "8",
+        "title": "DLQ Ready Messages",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_detailed_queue_messages_ready{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\".*\\\\.dlq$\"})"
+        ]
+      },
+      {
+        "id": "9",
+        "title": "Stage Ack Throughput",
+        "unit": "ops",
+        "queries": [
+          "sum by (queue) (rate(rabbitmq_detailed_queue_messages_acked_total{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"nutsnews\\\\.worker\\\\.($stage)\\\\.v1\"}[$__rate_interval]))"
+        ]
+      },
+      {
+        "id": "10",
+        "title": "Queue Metric Freshness",
+        "unit": "s",
+        "queries": [
+          "max(time() - timestamp(rabbitmq_detailed_queue_messages{job=\"nutsnews-rabbitmq-queues\",environment=~\"$environment\",host=~\"$host\",vhost=~\"$vhost\",queue=~\"$queue\"}))"
+        ]
+      },
+      {
+        "id": "11",
+        "title": "Broker Alarms",
+        "unit": "short",
+        "queries": [
+          "max(rabbitmq_alarms{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"} or rabbitmq_alarms_memory_used_watermark{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"} or rabbitmq_alarms_free_disk_space_watermark{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "12",
+        "title": "Alloy Remote Write Pending Samples",
+        "unit": "short",
+        "queries": [
+          "max(prometheus_remote_storage_samples_pending{job=\"nutsnews-backend-alloy\",instance=~\"$host\"})"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-worker-uplift-rmq-resources",
+    "title": "NutsNews Worker-Uplift RabbitMQ Resources",
+    "application": "nutsnews",
+    "panels": [
+      {
+        "id": "1",
+        "title": "RabbitMQ Connections",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_connections{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "2",
+        "title": "RabbitMQ Channels",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_channels{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "3",
+        "title": "RabbitMQ Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_consumers{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "4",
+        "title": "RabbitMQ Queue Count",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_queues{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "5",
+        "title": "RabbitMQ Memory Used",
+        "unit": "bytes",
+        "queries": [
+          "max(rabbitmq_process_resident_memory_bytes{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"} or rabbitmq_node_mem_used{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "6",
+        "title": "RabbitMQ Disk Free",
+        "unit": "bytes",
+        "queries": [
+          "min(rabbitmq_node_disk_free{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"} or rabbitmq_disk_space_available_bytes{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      },
+      {
+        "id": "7",
+        "title": "RabbitMQ File Descriptor Usage",
+        "unit": "percentunit",
+        "queries": [
+          "max(rabbitmq_process_open_fds{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"} / rabbitmq_process_max_fds{job=\"nutsnews-rabbitmq\",environment=~\"$environment\",host=~\"$host\"})"
+        ]
+      }
+    ]
+  }
+]
