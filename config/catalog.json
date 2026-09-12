@@ -1869,7 +1869,8 @@
         "unit": "percentunit",
         "queries": [
           "max(grafanacloud_instance_active_series / on(id) grafanacloud_instance_metrics_limits{limit_name=\"max_global_series_per_user\"})"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       },
       {
         "id": "2",
@@ -1885,7 +1886,8 @@
         "unit": "percentunit",
         "queries": [
           "max(grafanacloud_logs_instance_active_streams) / max(grafanacloud_logs_instance_limits{limit_name=\"max_global_streams_per_user\"})"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       },
       {
         "id": "4",
@@ -1893,7 +1895,8 @@
         "unit": "percentunit",
         "queries": [
           "max(grafanacloud_logs_instance_bytes_received_per_second) / (max(grafanacloud_logs_instance_limits{limit_name=\"ingestion_rate_mb\"}) * 1024 * 1024)"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       },
       {
         "id": "5",
@@ -1909,7 +1912,8 @@
         "unit": "short",
         "queries": [
           "grafanacloud_instance_metrics_limits or grafanacloud_logs_instance_limits or grafanacloud_traces_instance_limits"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       }
     ]
   },
