@@ -29,6 +29,7 @@ try{
  if(req.method!=='GET')return json(res,405,{error:'Read-only endpoint'});
  if(pathname==='/healthz')return json(res,200,{ok:true,release:release.portal||'development'});
  if(pathname.startsWith('/api/')){const ip=req.headers['cf-connecting-ip']||req.socket.remoteAddress;const now=Date.now(),r=rates.get(ip)||{n:0,until:now+60000};if(r.until<now){r.n=0;r.until=now+60000}r.n++;rates.set(ip,r);if(rates.size>2000)rates.delete(rates.keys().next().value);if(r.n>120)return json(res,429,{error:'Please wait before refreshing again'});}
+ if(pathname==='/api/public/release'){res.setHeader('Access-Control-Allow-Origin','https://localserver.wiki.ramideltoro.com');return json(res,200,release)}
  if(pathname==='/api/public/overview')return json(res,200,await overview(u.searchParams.get('range')));
  if(pathname.startsWith('/api/owner/')||pathname.startsWith('/owner')){if(!await owner(req)){if(pathname.startsWith('/api/'))return json(res,401,{error:'Owner sign-in required'},true);res.writeHead(302,{Location:'/cdn-cgi/access/login'+pathname});return res.end()}res.setHeader('Cache-Control','private, no-store');}
  if(pathname==='/api/owner/catalog')return json(res,200,catalog.map(({panels,...d})=>({...d,panelCount:panels.length})),true);
