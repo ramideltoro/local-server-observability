@@ -3,7 +3,8 @@ import {snapshot,metrics as collectorMetrics} from './collector.mjs';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
-import {createRemoteJWKSet,jwtVerify} from 'jose';
+import {createRemoteJWKSet} from 'jose';
+import {verifyOwnerToken} from './auth.mjs';
 import {windowFor,redact,publicSeries,metricState,publicMetrics} from './core.mjs';
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const catalog=JSON.parse(await fs.readFile(root+'/config/catalog.json','utf8'));
@@ -16,7 +17,7 @@ const prom=env.PROMETHEUS_UID||env.NUTSNEWS_GRAFANA_CLOUD_PROMETHEUS_DATASOURCE_
 const loki=env.LOKI_UID||env.NUTSNEWS_GRAFANA_CLOUD_LOKI_DATASOURCE_UID;
 async function query(expr,range,uid=prom){const w=windowFor(range);const key=JSON.stringify([expr,range,uid]);return cached(key,async()=>{const p=new URLSearchParams({query:expr,start:String(w.start),end:String(w.end),step:String(w.step)});const j=await grafana(`/api/datasources/proxy/uid/${encodeURIComponent(uid)}/api/v1/query_range?${p}`);if(j.status!=='success')throw Error('Metric query unavailable');return (j.data?.result||[]).slice(0,24)});}
 const issuer=(env.ACCESS_ISSUER||'').replace(/\/$/,'');const jwks=issuer?createRemoteJWKSet(new URL(issuer+'/cdn-cgi/access/certs')):null;
-async function owner(req){if(!jwks||!env.ACCESS_AUDIENCE)return false;try{const token=req.headers['cf-access-jwt-assertion'];if(typeof token!=='string')return false;const {payload}=await jwtVerify(token,jwks,{issuer,audience:env.ACCESS_AUDIENCE.split(',')});return typeof payload.email==='string'&&(env.OWNER_EMAILS||'').split(',').map(s=>s.trim().toLowerCase()).includes(payload.email.toLowerCase())}catch{return false}}
+async function owner(req){return verifyOwnerToken(req.headers['cf-access-jwt-assertion'],jwks,{issuer,audience:(env.ACCESS_AUDIENCE||'').split(','),emails:(env.OWNER_EMAILS||'').split(',')})}
 function json(res,code,data,privateData=false){res.writeHead(code,{'Content-Type':'application/json','Cache-Control':privateData?'private, no-store':'public, max-age=15','X-Content-Type-Options':'nosniff'});res.end(JSON.stringify(data))}
 async function health(url){const start=Date.now();try{const r=await fetch(url,{signal:AbortSignal.timeout(8000)});return {status:r.ok?'healthy':'degraded',latencyMs:Date.now()-start}}catch{return {status:'unavailable',latencyMs:null}}}
 async function overview(range){return cached('overview:'+range,async()=>{const metrics=await Promise.all(publicMetrics.map(async m=>{try{const series=publicSeries(await query(m.expr,range));return {id:m.id,title:m.title,unit:m.unit,series,state:metricState(series)}}catch{return {id:m.id,title:m.title,unit:m.unit,series:[],state:'unavailable'}}}));const services=await Promise.all([{id:'nutsnews',name:'NutsNews',description:'Public application',url:'https://nutsnews.com'},{id:'qwen',name:'Qwen local AI',description:'Production inference endpoint',url:'https://ai.nutsnews.com/health'},{id:'backend',name:'NutsNews backend',description:'Backend API',url:'https://backend.nutsnews.com/readyz'}].map(async s=>({id:s.id,name:s.name,description:s.description,...await health(s.url)})));return {updatedAt:new Date().toISOString(),metrics,services,release:release.portal?.slice(0,12)||'development'}})}
