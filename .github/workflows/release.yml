@@ -1,0 +1,29 @@
+name: Validate and release portal
+on:
+  pull_request:
+  push:
+    branches: [main]
+    paths-ignore: ['README.md']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with: {node-version: '22', cache: npm}
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run build
+  release:
+    needs: validate
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.AUTOMATION_TOKEN }}
+    steps:
+      - name: Dispatch serialized infrastructure deployment
+        run: gh workflow run deploy.yml --repo ramideltoro/local-server-infra --ref main -f operation=deploy -f portal_ref="$GITHUB_SHA"
