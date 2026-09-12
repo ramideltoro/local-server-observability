@@ -4,7 +4,7 @@ A central observability portal for the local server and NutsNews, available at [
 
 ## Experience
 
-Public pages show allowlisted endpoint health and aggregate resource metrics. The authenticated owner workspace adds 38 curated dashboards with 279 panels, bounded log search, alerts, trace availability, backups, and deployment diagnostics. Time ranges, freshness labels, and service-level navigation help distinguish an actual failure from missing evidence.
+Public pages show allowlisted endpoint health and aggregate resource metrics. The authenticated owner workspace adds 39 curated dashboards with 291 panels, bounded log search, alerts, trace availability, backups, and deployment diagnostics. Time ranges, freshness labels, and service-level navigation help distinguish an actual failure from missing evidence.
 
 ## Architecture
 

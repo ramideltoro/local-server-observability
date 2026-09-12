@@ -1,5 +1,108 @@
 [
   {
+    "id": "local-server-backups",
+    "title": "Local server backup freshness and outcomes",
+    "application": "local",
+    "panels": [
+      {
+        "id": "image-success",
+        "title": "Image backup last outcome",
+        "unit": "short",
+        "queries": [
+          "max(home_server_backup_last_success{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "image-age",
+        "title": "Time since image backup",
+        "unit": "s",
+        "queries": [
+          "time() - max(home_server_backup_last_run_timestamp_seconds{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "image-size",
+        "title": "Image backup size",
+        "unit": "bytes",
+        "queries": [
+          "max(home_server_backup_last_size_bytes{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "image-duration",
+        "title": "Image backup duration",
+        "unit": "s",
+        "queries": [
+          "max(home_server_backup_last_duration_seconds{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "image-cloud-age",
+        "title": "Time since latest cloud image",
+        "unit": "s",
+        "queries": [
+          "time() - max(home_server_backup_latest_cloud_backup_timestamp_seconds{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "image-next",
+        "title": "Time until scheduled image backup",
+        "unit": "s",
+        "queries": [
+          "max(home_server_backup_next_run_timestamp_seconds{instance=\"chingadera\"}) - time()"
+        ]
+      },
+      {
+        "id": "db-success",
+        "title": "Database backup last outcome",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_db_backup_last_success{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "db-age",
+        "title": "Time since database backup attempt",
+        "unit": "s",
+        "queries": [
+          "time() - max(nutsnews_db_backup_last_run_timestamp_seconds{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "db-size",
+        "title": "Database backup size",
+        "unit": "bytes",
+        "queries": [
+          "max(nutsnews_db_backup_last_size_bytes{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "db-duration",
+        "title": "Database backup duration",
+        "unit": "s",
+        "queries": [
+          "max(nutsnews_db_backup_last_duration_seconds{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "db-freshness",
+        "title": "Database backup status age",
+        "unit": "s",
+        "queries": [
+          "time() - max(nutsnews_db_backup_status_metrics_last_update_timestamp_seconds{instance=\"chingadera\"})"
+        ]
+      },
+      {
+        "id": "db-cloud-count",
+        "title": "Cloud database backup count",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_db_backup_cloud_available_count{instance=\"chingadera\"})"
+        ]
+      }
+    ]
+  },
+  {
     "id": "local-server-services",
     "title": "Local server services and Qwen",
     "application": "local",
@@ -1869,7 +1972,8 @@
         "unit": "percentunit",
         "queries": [
           "max(grafanacloud_instance_active_series / on(id) grafanacloud_instance_metrics_limits{limit_name=\"max_global_series_per_user\"})"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       },
       {
         "id": "2",
@@ -1885,7 +1989,8 @@
         "unit": "percentunit",
         "queries": [
           "max(grafanacloud_logs_instance_active_streams) / max(grafanacloud_logs_instance_limits{limit_name=\"max_global_streams_per_user\"})"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       },
       {
         "id": "4",
@@ -1893,7 +1998,8 @@
         "unit": "percentunit",
         "queries": [
           "max(grafanacloud_logs_instance_bytes_received_per_second) / (max(grafanacloud_logs_instance_limits{limit_name=\"ingestion_rate_mb\"}) * 1024 * 1024)"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       },
       {
         "id": "5",
@@ -1909,7 +2015,8 @@
         "unit": "short",
         "queries": [
           "grafanacloud_instance_metrics_limits or grafanacloud_logs_instance_limits or grafanacloud_traces_instance_limits"
-        ]
+        ],
+        "datasource": "grafanacloud-usage"
       }
     ]
   },
