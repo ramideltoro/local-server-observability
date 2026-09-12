@@ -1,2 +1,39 @@
-import test from 'node:test';import assert from 'node:assert/strict';import {spawn} from 'node:child_process';
-test('HTTP public shell and owner API boundary',async()=>{const child=spawn(process.execPath,['server/index.mjs'],{env:{...process.env,PORT:'14310',METRICS_PORT:'14311',ACCESS_ISSUER:'',ACCESS_AUDIENCE:''},stdio:'pipe'});try{await new Promise((resolve,reject)=>{child.stdout.once('data',resolve);child.once('exit',code=>reject(Error('Server exited '+code)));setTimeout(()=>reject(Error('Startup timeout')),5000).unref()});const page=await fetch('http://127.0.0.1:14310/');assert.equal(page.status,200);assert((await page.text()).includes('<div id="root">'));const r=await fetch('http://127.0.0.1:14310/api/owner/catalog',{headers:{'cf-access-authenticated-user-email':'owner@example.com','cf-access-jwt-assertion':'forged'}});assert.equal(r.status,401);assert.equal(r.headers.get('cache-control'),'private, no-store');const write=await fetch('http://127.0.0.1:14310/api/public/overview',{method:'POST'});assert.equal(write.status,405)}finally{child.kill('SIGTERM')}});
+import test from "node:test";
+import assert from "node:assert/strict";
+import { spawn } from "node:child_process";
+test("HTTP public shell and owner API boundary", async () => {
+  const child = spawn(process.execPath, ["server/index.mjs"], {
+    env: {
+      ...process.env,
+      PORT: "14310",
+      METRICS_PORT: "14311",
+      ACCESS_ISSUER: "",
+      ACCESS_AUDIENCE: "",
+    },
+    stdio: "pipe",
+  });
+  try {
+    await new Promise((resolve, reject) => {
+      child.stdout.once("data", resolve);
+      child.once("exit", (code) => reject(Error("Server exited " + code)));
+      setTimeout(() => reject(Error("Startup timeout")), 5000).unref();
+    });
+    const page = await fetch("http://127.0.0.1:14310/");
+    assert.equal(page.status, 200);
+    assert((await page.text()).includes('<div id="root">'));
+    const r = await fetch("http://127.0.0.1:14310/api/owner/catalog", {
+      headers: {
+        "cf-access-authenticated-user-email": "owner@example.com",
+        "cf-access-jwt-assertion": "forged",
+      },
+    });
+    assert.equal(r.status, 401);
+    assert.equal(r.headers.get("cache-control"), "private, no-store");
+    const write = await fetch("http://127.0.0.1:14310/api/public/overview", {
+      method: "POST",
+    });
+    assert.equal(write.status, 405);
+  } finally {
+    child.kill("SIGTERM");
+  }
+});
