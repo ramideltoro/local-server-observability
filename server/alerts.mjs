@@ -5,6 +5,7 @@ export function alertCatalog(
   groups,
   instances,
   now = new Date().toISOString(),
+  silences = [],
 ) {
   const runtime = (groups.data?.groups || []).flatMap((g) =>
     (g.rules || []).map((r) => ({ ...r, interval: g.interval, group: g.name })),
@@ -22,7 +23,29 @@ export function alertCatalog(
           a.labels?.__alert_rule_uid__ === r.uid ||
           a.labels?.alertname === r.title,
       );
-      const silenced = active.some((a) => a.status?.silencedBy?.length > 0);
+      const labels = {
+        ...r.labels,
+        alertname: r.title,
+        __alert_rule_uid__: r.uid,
+      };
+      const ruleSilenced = silences.some(
+        (s) =>
+          s.status?.state === "active" &&
+          s.matchers?.length &&
+          s.matchers.every((m) => {
+            if (!(m.name in labels)) return false;
+            try {
+              const matches = m.isRegex
+                ? new RegExp("^(?:" + m.value + ")$").test(labels[m.name])
+                : labels[m.name] === m.value;
+              return m.isEqual === false ? !matches : matches;
+            } catch {
+              return false;
+            }
+          }),
+      );
+      const silenced =
+        ruleSilenced || active.some((a) => a.status?.silencedBy?.length > 0);
       const conditions = (r.data || [])
         .flatMap((d) =>
           (d.model?.conditions || []).map((c) => ({
@@ -61,16 +84,38 @@ export function alertCatalog(
           ? "paused"
           : run?.health === "error"
             ? "evaluation-error"
-            : run?.state || "unknown",
+            : run?.health === "nodata" || run?.state === "no_data"
+              ? "no-data"
+              : run?.state || "unknown",
         intervalSeconds: run?.interval ?? null,
         pending: r.for || "0s",
         lastEvaluation: run?.lastEvaluation || null,
         lookbackSeconds: lookbacks,
         thresholds: conditions,
         purpose: `${r.title}. Evaluated by the existing Cloud rule group.`,
-        signal: "Metric expression (owner diagnostics)",
+        signal: /cpu/i.test(r.title)
+          ? "CPU utilization"
+          : /memory|ram/i.test(r.title)
+            ? "Memory pressure"
+            : /backup/i.test(r.title)
+              ? "Backup outcome or freshness"
+              : /latency|duration/i.test(r.title)
+                ? "Request or job latency"
+                : /queue|rabbitmq/i.test(r.title)
+                  ? "Queue and message broker health"
+                  : /disk|filesystem/i.test(r.title)
+                    ? "Storage capacity and I/O"
+                    : /log/i.test(r.title)
+                      ? "Log pipeline health"
+                      : "Service metric or SLO expression",
         datasource: "Grafana Cloud",
-        runbook: "/../#alerts",
+        runbook: "https://localserver.wiki.ramideltoro.com/technical/alerts/",
+        kind: run?.type || "alerting",
+        silenceScope: ruleSilenced
+          ? "rule"
+          : silenced
+            ? "active instances"
+            : null,
         evaluationNote: run
           ? "Actual rule-group interval"
           : "Rule-group evaluation metadata unavailable",

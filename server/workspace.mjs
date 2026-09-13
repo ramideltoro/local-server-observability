@@ -154,12 +154,19 @@ export function workspace({ owner, grafana, json, cached, root }) {
         await cached(
           "rule-catalog",
           async () => {
-            const [rules, groups, alerts] = await Promise.all([
+            const [rules, groups, alerts, silences] = await Promise.all([
               grafana("/api/v1/provisioning/alert-rules"),
               grafana("/api/prometheus/grafana/api/v1/rules"),
               grafana("/api/alertmanager/grafana/api/v2/alerts"),
+              grafana("/api/alertmanager/grafana/api/v2/silences"),
             ]);
-            return alertCatalog(rules, groups, alerts);
+            return alertCatalog(
+              rules,
+              groups,
+              alerts,
+              new Date().toISOString(),
+              silences,
+            );
           },
           60000,
         ),
