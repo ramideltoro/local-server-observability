@@ -1,0 +1,159 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-09-13",
+  "servers": [
+    {
+      "id": "local",
+      "name": "Local server",
+      "applications": [
+        "qwen",
+        "observability"
+      ],
+      "services": [
+        "nutsnews-local-ai",
+        "ollama",
+        "cloudflared",
+        "alloy",
+        "local-server-observability"
+      ],
+      "sources": [
+        "metrics",
+        "logs",
+        "service-exporter"
+      ],
+      "evidence": "Adopted systemd service inventory and infrastructure deployment configuration"
+    },
+    {
+      "id": "backend-vps",
+      "name": "NutsNews Backend VPS",
+      "applications": [
+        "nutsnews",
+        "fantasy"
+      ],
+      "services": [
+        "alloy",
+        "caddy",
+        "docker",
+        "postgresql@18-main",
+        "nutsnews-worker-db-api",
+        "nutsnews-wiki-ai-ollama",
+        "nutsnews-wiki-ai-proxy"
+      ],
+      "sources": [
+        "metrics",
+        "logs"
+      ],
+      "evidence": "Running systemd inventory; /opt/fantasy-football-edge-v2/compose.yaml and successful loopback /healthz on 3102"
+    },
+    {
+      "id": "nutsnews-vps",
+      "name": "NutsNews VPS",
+      "applications": [
+        "nutsnews"
+      ],
+      "services": [
+        "alloy",
+        "docker",
+        "nutsnews-infra-health"
+      ],
+      "sources": [
+        "metrics",
+        "logs"
+      ],
+      "evidence": "Running systemd inventory and /opt/nutsnews deployment"
+    },
+    {
+      "id": "raspberry",
+      "name": "Raspberry Pi",
+      "applications": [
+        "raspberry-observability"
+      ],
+      "services": [
+        "docker",
+        "lighttpd",
+        "tar1090",
+        "airplanes-feed",
+        "airplanes-mlat"
+      ],
+      "sources": [
+        "metrics",
+        "logs"
+      ],
+      "evidence": "Running systemd inventory; application container verification pending",
+      "limitation": "Application container hosting and telemetry selectors require verification"
+    },
+    {
+      "id": "external",
+      "name": "External hosting",
+      "applications": [
+        "ramideltoro",
+        "showalgo"
+      ],
+      "services": [],
+      "sources": [
+        "https-probes"
+      ],
+      "evidence": "Public HTTPS endpoints; underlying hosting account not yet verified",
+      "limitation": "Public probes measure availability, latency and TLS only"
+    },
+    {
+      "id": "unverified",
+      "name": "Hosting to verify",
+      "applications": [
+        "antenna",
+        "skyglow"
+      ],
+      "services": [],
+      "sources": [],
+      "evidence": "Requested systems; repository and deployment evidence are not yet accessible",
+      "limitation": "Antenna and Skyglow hosting has not been verified"
+    }
+  ],
+  "applications": [
+    {
+      "id": "qwen",
+      "name": "Qwen AI",
+      "coverage": "Authenticated health and service exporter; production endpoint unchanged"
+    },
+    {
+      "id": "observability",
+      "name": "Observability",
+      "coverage": "Portal, exporters, daily reports and Grafana"
+    },
+    {
+      "id": "nutsnews",
+      "name": "NutsNews",
+      "coverage": "Both VPS hosts, Cloud workers, queues, databases and existing Cloud dashboards"
+    },
+    {
+      "id": "fantasy",
+      "name": "Fantasy Football Edge",
+      "coverage": "HTTPS and backend/database health; importer and application error instrumentation missing"
+    },
+    {
+      "id": "antenna",
+      "name": "Antenna Observatory",
+      "coverage": "Raspberry telemetry discovery in progress"
+    },
+    {
+      "id": "skyglow",
+      "name": "Skyglow",
+      "coverage": "Raspberry telemetry discovery in progress"
+    },
+    {
+      "id": "raspberry-observability",
+      "name": "Raspberry Observability",
+      "coverage": "Existing Cloud dashboard catalog; source coverage reported per inspection"
+    },
+    {
+      "id": "ramideltoro",
+      "name": "ramideltoro.com",
+      "coverage": "HTTPS availability, latency and certificate expiry"
+    },
+    {
+      "id": "showalgo",
+      "name": "ShowAlgo",
+      "coverage": "HTTPS availability, latency and certificate expiry"
+    }
+  ]
+}

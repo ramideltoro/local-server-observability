@@ -145,3 +145,24 @@ for (const [id, instance] of [
   ])
     publicMetrics.push({ id: id + "-" + metric, title, unit, expr });
 }
+
+publicMetrics.push(
+  {
+    id: "raspberry-cpu",
+    title: "Raspberry CPU",
+    unit: "percent",
+    expr: '100*sum(rate(pi_public_cpu_seconds_total{project="raspberry",mode!="idle"}[5m]))/sum(rate(pi_public_cpu_seconds_total{project="raspberry"}[5m]))',
+  },
+  {
+    id: "raspberry-temperature",
+    title: "Raspberry temperature",
+    unit: "celsius",
+    expr: 'pi_public_temperature_celsius{project="raspberry"}',
+  },
+  {
+    id: "raspberry-memory-available",
+    title: "Raspberry available memory",
+    unit: "bytes",
+    expr: 'pi_public_memory_available_bytes{project="raspberry"}',
+  },
+);
