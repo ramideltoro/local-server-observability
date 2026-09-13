@@ -1,0 +1,274 @@
+{
+  "uid": "published-215ed26a-c28",
+  "title": "Backend resources · My dashboard",
+  "editable": false,
+  "schemaVersion": 39,
+  "panels": [
+    {
+      "id": 1,
+      "title": "CPU Busy",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_fcd16c7259c44d5eb57209af",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 2,
+      "title": "Load Per CPU",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_da0afcda8e40516f340d8d79",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 3,
+      "title": "Memory Used",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_40d8ffa1a10400d81124ba74",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 4,
+      "title": "Swap Used",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_e25e0fa6b663293e9022bebf",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 5,
+      "title": "Root Disk Used",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_f3a3a2c233db9fc59af3ae56",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 6,
+      "title": "Root Inodes Used",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_dc16f7759edeaebda9093d7e",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 7,
+      "title": "Network Receive",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_e50e38008b2ff71f64012e3f",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {}
+    },
+    {
+      "id": 8,
+      "title": "Network Transmit",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 24
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "approved_84d1730e51b227f78616cce1",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "public-metrics"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "public-metrics"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {}
+    }
+  ],
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "annotations": {
+    "list": []
+  },
+  "templating": {
+    "list": []
+  }
+}
