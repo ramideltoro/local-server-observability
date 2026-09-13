@@ -407,24 +407,49 @@ export default function Workspace() {
                           <a key={id} href={"#app/" + id}>
                             {inventory.applications.find((a) => a.id === id)
                               ?.name || id}
+                            {overview?.services.find(
+                              (service) => service.id === id,
+                            ) && (
+                              <small className="ws-app-health">
+                                {
+                                  overview.services.find(
+                                    (service) => service.id === id,
+                                  )?.status
+                                }
+                              </small>
+                            )}
+                            {overview?.metrics.some(
+                              (m) => m.id === id + "-latency",
+                            ) && (
+                              <small className="ws-app-health">
+                                {value(
+                                  overview.metrics.find(
+                                    (m) => m.id === id + "-latency",
+                                  ),
+                                )}{" "}
+                                response
+                              </small>
+                            )}
                           </a>
                         ))}
                       </div>
                     </div>
-                    <div className="ws-resources">
-                      {["cpu", "memory", "disk"].map((k) => {
-                        const m = overview?.metrics.find(
-                          (m) =>
-                            m.id === (s.id === "local" ? k : s.id + "-" + k),
-                        );
-                        return (
-                          <div key={k}>
-                            <strong>{value(m)}</strong>
-                            <small>{k}</small>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    {s.services.length > 0 && (
+                      <div className="ws-resources">
+                        {["cpu", "memory", "disk"].map((k) => {
+                          const m = overview?.metrics.find(
+                            (m) =>
+                              m.id === (s.id === "local" ? k : s.id + "-" + k),
+                          );
+                          return (
+                            <div key={k}>
+                              <strong>{value(m)}</strong>
+                              <small>{k}</small>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                     {s.limitation && (
                       <p className="ws-coverage">{s.limitation}</p>
                     )}

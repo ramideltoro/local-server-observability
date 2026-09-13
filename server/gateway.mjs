@@ -6,6 +6,8 @@ export const registeredQueries = new Map(
 );
 export const queryKey = (expr) =>
   "approved_" + createHash("sha256").update(expr).digest("hex").slice(0, 24);
+for (const metric of publicMetrics)
+  registeredQueries.set(queryKey(metric.expr), metric);
 export function fixedQuery(expr, application) {
   return expr
     .replace(
