@@ -1,3 +1,5 @@
+import {workspace} from "./workspace.mjs";
+import {startGateway} from "./native.mjs";
 import http from "node:http";
 import { startWebsiteMonitor } from "./websites.mjs";
 const websiteMonitor = startWebsiteMonitor();
@@ -229,6 +231,8 @@ async function dashboard(id, range) {
   }
   return { ...d, panels };
 }
+const handleWorkspace=workspace({owner,grafana,json,cached,root});
+startGateway(env);
 const rates = new Map();
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url || "/", "http://localhost");
@@ -241,6 +245,7 @@ const server = http.createServer(async (req, res) => {
   );
   try {
     if (await handleAuth(req, res, u)) return;
+    if (await handleWorkspace(req,res,u)) return;
     if (req.method !== "GET")
       return json(res, 405, { error: "Read-only endpoint" });
     if (pathname === "/healthz")
