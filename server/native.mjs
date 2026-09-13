@@ -16,7 +16,7 @@ export function publicRoute(method, pathname) {
   if (method !== "GET") return false;
   return (
     /^\/apis\/dashboard\.grafana\.app\/$/.test(pathname) ||
-    /^\/apis\/dashboard\.grafana\.app\/v(?:1beta1|2beta1)\/namespaces\/default\/dashboards\/[a-zA-Z0-9_-]+(?:\/dto)?$/.test(
+    /^\/apis\/dashboard\.grafana\.app\/v(?:1|2|1beta1|2beta1)\/namespaces\/default\/dashboards\/[a-zA-Z0-9_-]+(?:\/dto)?$/.test(
       pathname,
     ) ||
     /^\/(?:public\/|d\/|d-solo\/)/.test(pathname) ||
@@ -57,7 +57,7 @@ export async function proxyGrafana(req, res, url, isOwner) {
     res.writeHead(403);
     return res.end("Invalid origin");
   }
-  const payload = await body(req);
+  let payload = await body(req);
   if (!isOwner && req.method === "POST") {
     let b;
     try {
@@ -102,6 +102,12 @@ export async function proxyGrafana(req, res, url, isOwner) {
         return res.end("Unregistered or unbounded query");
       }
     }
+    payload = Buffer.from(JSON.stringify({from:b.from,to:b.to,queries:b.queries.map((q,i)=>({
+      refId:/^[A-Za-z0-9]{1,8}$/.test(q.refId)?q.refId:String.fromCharCode(65+i),
+      expr:q.expr,datasource:{uid:'public-metrics',type:'prometheus'},
+      intervalMs:Math.max(60000,Math.ceil((Number(b.to)-Number(b.from))/180)),
+      maxDataPoints:180,range:q.range!==false,instant:q.instant===true,format:'time_series'
+    }))}));
   }
   const headers = {
     host: "observe.ramideltoro.com",
@@ -131,7 +137,11 @@ export async function proxyGrafana(req, res, url, isOwner) {
         if (response.headers[key]) res.setHeader(key, response.headers[key]);
       res.setHeader(
         "Cache-Control",
-        isOwner ? "private, no-store" : "no-store",
+        route.startsWith("/public/build/")
+          ? "public, max-age=31536000, immutable"
+          : isOwner
+            ? "private, no-store"
+            : "no-store",
       );
       res.writeHead(response.statusCode);
       response.pipe(res);
