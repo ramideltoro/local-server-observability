@@ -72,7 +72,7 @@ type Report = {
     note: string;
     failures: unknown[];
   }[];
-  ai: { note: string };
+  ai: { note: string; summary?:string; evidence?:{id:string,system:string,check:string}[] };
 };
 type Rule = {
   id: string;
@@ -674,6 +674,7 @@ export default function Workspace() {
                   </p>
                 )}
                 <p>{r.ai.note}</p>
+                {r.ai.summary && <blockquote>{r.ai.summary}<p>{r.ai.evidence?.map(e=>`${e.id}: ${e.system} / ${e.check}`).join(' · ')}</p></blockquote>}
                 <div className="ws-checks">
                   {r.checks.map((c, i) => (
                     <div key={i}>
