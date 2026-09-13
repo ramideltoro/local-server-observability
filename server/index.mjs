@@ -3,8 +3,7 @@ import { snapshot, metrics as collectorMetrics } from "./collector.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { createRemoteJWKSet } from "jose";
-import { verifyOwnerToken } from "./auth.mjs";
+import { createGoogleAuth } from "./google-auth.mjs";
 import {
   windowFor,
   redact,
@@ -77,17 +76,7 @@ async function query(expr, range, uid = prom) {
     return (j.data?.result || []).slice(0, 24);
   });
 }
-const issuer = (env.ACCESS_ISSUER || "").replace(/\/$/, "");
-const jwks = issuer
-  ? createRemoteJWKSet(new URL(issuer + "/cdn-cgi/access/certs"))
-  : null;
-async function owner(req) {
-  return verifyOwnerToken(req.headers["cf-access-jwt-assertion"], jwks, {
-    issuer,
-    audience: (env.ACCESS_AUDIENCE || "").split(","),
-    emails: (env.OWNER_EMAILS || "").split(","),
-  });
-}
+const { owner, handle: handleAuth } = createGoogleAuth(env);
 function json(res, code, data, privateData = false) {
   res.writeHead(code, {
     "Content-Type": "application/json",
@@ -238,11 +227,13 @@ const server = http.createServer(async (req, res) => {
     "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; base-uri 'self'",
   );
   try {
+    if (await handleAuth(req, res, u)) return;
     if (req.method !== "GET")
       return json(res, 405, { error: "Read-only endpoint" });
     if (pathname === "/healthz")
       return json(res, 200, {
         ok: true,
+        authentication: "google",
         release: release.portal || "development",
       });
     if (pathname.startsWith("/api/")) {
@@ -272,7 +263,10 @@ const server = http.createServer(async (req, res) => {
       if (!(await owner(req))) {
         if (pathname.startsWith("/api/"))
           return json(res, 401, { error: "Owner sign-in required" }, true);
-        res.writeHead(302, { Location: "/cdn-cgi/access/login" + pathname });
+        res.writeHead(302, {
+          Location: "/auth/google",
+          "Cache-Control": "private, no-store",
+        });
         return res.end();
       }
       res.setHeader("Cache-Control", "private, no-store");

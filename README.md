@@ -8,15 +8,15 @@ Public pages show allowlisted endpoint health and aggregate resource metrics. Th
 
 ## Architecture
 
-React + TypeScript + Vite provide the interface. A Node.js server queries Grafana using server-side credentials, validates Cloudflare Access JWTs, bounds queries, and keeps private responses out of public caches. A separate loopback metrics listener exposes service-health signals to Alloy.
+React + TypeScript + Vite provide the interface. A Node.js server queries Grafana using server-side credentials, validates Google OpenID Connect sign-in and secure owner sessions, bounds queries, and keeps private responses out of public caches. A separate loopback metrics listener exposes service-health signals to Alloy.
 
 ## Development
 
 ```sh
 npm ci
 npm run check
-npm test
 npm run build
+npm test
 npm start
 ```
 
@@ -33,3 +33,7 @@ The catalog imports existing local-host and NutsNews metrics. Existing source pi
 ## Documentation
 
 The [wiki](https://localserver.wiki.ramideltoro.com) contains Summary, Technical, and Expert explanations, architecture, runbooks, public/private boundaries, and release synchronization details. Full documentation lives in [local-server-wiki](https://github.com/ramideltoro/local-server-wiki).
+
+## Google owner sign-in
+
+Owner links go directly to Google OAuth. Register `https://observe.ramideltoro.com/auth/google/callback` on the web OAuth client. Supply `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, a random `SESSION_SECRET` of at least 32 bytes, and `OWNER_EMAILS` through the infrastructure runtime secret. Only verified Google emails on that allowlist receive a 12-hour Secure, HttpOnly session. State, PKCE, and nonce protect the one-use callback. Login returns to the selected diagnostics tab; expired sessions prompt a new sign-in. Cloudflare still carries tunnel traffic and protects deployment SSH, but is not the portal identity provider.

@@ -209,6 +209,16 @@ function Plot({
 }
 async function api<T>(url: string, signal?: AbortSignal): Promise<T> {
   const r = await fetch(url, { signal });
+  if (r.status === 401) {
+    location.assign(
+      "/auth/google?returnTo=" + encodeURIComponent("/owner/" + location.hash),
+    );
+    throw Error("Please sign in with Google to continue");
+  }
+  if (!r.headers.get("content-type")?.includes("application/json"))
+    throw Error(
+      "The service could not return data. Please refresh or sign in again.",
+    );
   const j = await r.json();
   if (!r.ok) throw Error(j.error || "Unable to load data");
   return j;
@@ -427,9 +437,14 @@ function App() {
               Grafana Cloud<small>Central telemetry source</small>
             </span>
           </div>
-          <a className="owner-link" href={owner ? "/" : "/owner/"}>
+          {owner && (
+            <form action="/auth/logout" method="post">
+              <button type="submit">Sign out</button>
+            </form>
+          )}
+          <a className="owner-link" href={owner ? "/" : "/auth/google"}>
             <ShieldCheck size={17} />
-            {owner ? "Owner view · return to public" : "Sign in to owner view"}
+            {owner ? "Owner view · return to public" : "Sign in with Google"}
           </a>
         </div>
       </aside>
@@ -652,8 +667,14 @@ function App() {
                 Sign in to explore detailed {title.toLowerCase()}, internal
                 service health, and operational diagnostics.
               </p>
-              <a className="primary" href={"/owner/#" + tab}>
-                Open owner view <ArrowUpRight size={16} />
+              <a
+                className="primary"
+                href={
+                  "/auth/google?returnTo=" +
+                  encodeURIComponent("/owner/#" + tab)
+                }
+              >
+                Sign in with Google <ArrowUpRight size={16} />
               </a>
               <small>Public health remains available without signing in.</small>
             </section>
@@ -668,7 +689,12 @@ function App() {
                   databases, and logs.
                 </p>
               </div>
-              <a href={"/owner/#" + tab}>
+              <a
+                href={
+                  "/auth/google?returnTo=" +
+                  encodeURIComponent("/owner/#" + tab)
+                }
+              >
                 Open diagnostics <ArrowUpRight size={15} />
               </a>
             </div>
