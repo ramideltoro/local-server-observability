@@ -62,3 +62,23 @@ test("alert group interval is independent from pending duration and silence", ()
     null,
   );
 });
+import fs from "node:fs";
+test("published dashboard files contain only approved public projections", () => {
+  const dir = new URL("../config/published/", import.meta.url);
+  if (!fs.existsSync(dir)) return;
+  for (const file of fs.readdirSync(dir)) {
+    const d = JSON.parse(fs.readFileSync(new URL(file, dir), "utf8"));
+    assert.match(d.uid, /^published-[a-zA-Z0-9-]+$/);
+    assert.deepEqual({ ...publishable(d), uid: d.uid }, d);
+  }
+});
+test("Grafana stable and beta read APIs are supported without writes", () => {
+  for (const version of ["v1", "v2", "v1beta1", "v2beta1"]) {
+    const path =
+      "/apis/dashboard.grafana.app/" +
+      version +
+      "/namespaces/default/dashboards/fleet-metrics/dto";
+    assert.equal(publicRoute("GET", path), true);
+    assert.equal(publicRoute("POST", path), false);
+  }
+});

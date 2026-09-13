@@ -91,6 +91,7 @@ function useData<T>(url: string) {
   const [data, setData] = useState<T>();
   const [error, setError] = useState("");
   useEffect(() => {
+    if (!url) return;
     let live = true;
     const load = () =>
       fetch(url)
@@ -139,6 +140,9 @@ export default function Workspace() {
   const sidebar = useRef<HTMLElement>(null);
   const menuButton = useRef<HTMLButtonElement>(null);
   const owner = location.pathname.startsWith("/owner");
+  const { data: mine } = useData<{
+    dashboards: { id: string; title: string; url: string }[];
+  }>(owner ? "/api/owner/workspace" : "");
   const { data: inventory } = useData<Inventory>("/api/public/inventory");
   const { data: overview, error } = useData<{
     metrics: Metric[];
@@ -774,6 +778,16 @@ export default function Workspace() {
               copy in My dashboards.
             </p>
             <a href="/owner/grafana/">Open owner Grafana ↗</a>
+            <div className="ws-list">
+              {mine?.dashboards.map((d) => (
+                <div key={d.id} className="ws-dashboard">
+                  <a href={d.url}>{d.title}</a>
+                  <button onClick={() => setPublishUid(d.id)}>
+                    Select for publishing
+                  </button>
+                </div>
+              ))}
+            </div>
             <div className="ws-actions">
               <input
                 aria-label="Workspace dashboard UID"

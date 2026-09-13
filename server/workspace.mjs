@@ -8,8 +8,7 @@ export function workspace({ owner, grafana, json, cached, root }) {
   return async (req, res, u) => {
     if (
       u.pathname.startsWith("/api/") ||
-      u.pathname.startsWith("/grafana/") ||
-      u.pathname.startsWith("/owner/grafana/")
+      /^\/(?:owner\/)?grafana\/apis?\//.test(u.pathname)
     ) {
       const ip =
         req.socket.remoteAddress +
@@ -44,8 +43,32 @@ export function workspace({ owner, grafana, json, cached, root }) {
       "/api/public/rules",
       "/api/owner/scan",
       "/api/owner/publish",
+      "/api/owner/workspace",
     ];
     if (!routes.includes(p)) return false;
+    if (p === "/api/owner/workspace") {
+      if (req.method !== "GET" || !(await owner(req))) {
+        json(res, 403, { error: "Google owner required" }, true);
+        return true;
+      }
+      const response = await fetch(
+        "http://127.0.0.1:4321/owner/grafana/api/search?type=dash-db&limit=1000",
+        {
+          headers: { "X-WEBAUTH-USER": "portal-owner" },
+          signal: AbortSignal.timeout(10000),
+        },
+      );
+      if (!response.ok) throw Error("Workspace unavailable");
+      const dashboards = (await response.json())
+        .filter((d) => d.folderTitle === "My dashboards")
+        .map((d) => ({
+          id: d.uid,
+          title: d.title,
+          url: "/owner/grafana/d/" + d.uid + "/view",
+        }));
+      json(res, 200, { dashboards }, true);
+      return true;
+    }
     if (p === "/api/owner/scan" || p === "/api/owner/publish") {
       if (req.method !== "POST") {
         json(res, 405, { error: "POST required" }, true);
