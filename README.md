@@ -1,10 +1,10 @@
 # Local Server Observability
 
-A central observability portal for the local server and NutsNews, available at [observe.ramideltoro.com](https://observe.ramideltoro.com). It presents real telemetry in a modern amber-accented interface while preserving the existing Grafana Cloud storage and alerting setup.
+A central observability portal for the local server and NutsNews, available at [observe.ramideltoro.com](https://observe.ramideltoro.com). It presents real telemetry in a dark charcoal interface with amber accents while preserving the existing Grafana Cloud storage and alerting setup.
 
 ## Experience
 
-Public pages show allowlisted endpoint health and aggregate resource metrics. The authenticated owner workspace adds 41 curated dashboards with 301 panels, bounded log search, alerts, trace availability, backups, and deployment diagnostics. Time ranges, freshness labels, and service-level navigation help distinguish an actual failure from missing evidence.
+Public pages show allowlisted endpoint health and aggregate resource metrics. The authenticated owner workspace adds 42 curated dashboards with 308 panels, bounded log search, alerts, trace availability, backups, and deployment diagnostics. Time ranges, freshness labels, and service-level navigation help distinguish an actual failure from missing evidence.
 
 ## Architecture
 
@@ -41,3 +41,7 @@ Owner links go directly to Google OAuth. Register `https://observe.ramideltoro.c
 ## Website telemetry
 
 Dedicated Rami Del Toro and ShowAlgo views monitor `https://www.ramideltoro.com` and `https://www.showalgo.com` every 60 seconds from the local server. HTTPS probes validate certificates, measure time to headers, record HTTP status and certificate expiry, and export bounded Prometheus metrics through the existing Alloy scrape. Checks run without browser traffic, have an 8-second deadline, do not follow redirects, and discard response bodies. Historical panels include rolling-hour availability, response time, HTTP status, TLS lifetime, and collection freshness. No visitor tracking or provider-specific logs are collected.
+
+## Application and host views
+
+Fantasy Football Edge checks its website and database-backed `/healthz` every minute. Backend VPS and NutsNews VPS have individually scoped CPU, memory, root disk and load charts, grouped owner dashboards, and host-specific log filters. Existing collection and Qwen workers remain unchanged. Fantasy importer freshness and application process metrics are not yet instrumented.

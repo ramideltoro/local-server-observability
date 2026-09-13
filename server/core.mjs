@@ -82,7 +82,7 @@ export const publicMetrics = [
   },
 ];
 
-for (const id of ["ramideltoro", "showalgo"]) {
+for (const id of ["ramideltoro", "showalgo", "fantasy"]) {
   for (const [metric, title, unit, expr] of [
     [
       "availability",
@@ -110,4 +110,38 @@ for (const id of ["ramideltoro", "showalgo"]) {
     ],
   ])
     publicMetrics.push({ id: `${id}-${metric}`, title, unit, expr });
+}
+
+publicMetrics.push({
+  id: "fantasy-database",
+  title: "Backend & database health",
+  unit: "percent",
+  expr: '100 * website_probe_success{website="fantasy-health"}',
+});
+for (const [id, instance] of [
+  ["backend-vps", "backend.nutsnews.com"],
+  ["nutsnews-vps", "vps.nutsnews.com"],
+]) {
+  for (const [metric, title, unit, expr] of [
+    [
+      "cpu",
+      "CPU utilization",
+      "percent",
+      `100 * (1 - avg(rate(node_cpu_seconds_total{instance="${instance}",mode="idle"}[5m])))`,
+    ],
+    [
+      "memory",
+      "Memory used",
+      "percent",
+      `100 * (1 - max(node_memory_MemAvailable_bytes{instance="${instance}"}) / max(node_memory_MemTotal_bytes{instance="${instance}"}))`,
+    ],
+    [
+      "disk",
+      "Root disk used",
+      "percent",
+      `100 * (1 - max(node_filesystem_avail_bytes{instance="${instance}",mountpoint="/"}) / max(node_filesystem_size_bytes{instance="${instance}",mountpoint="/"}))`,
+    ],
+    ["load", "System load", "short", `max(node_load1{instance="${instance}"})`],
+  ])
+    publicMetrics.push({ id: id + "-" + metric, title, unit, expr });
 }

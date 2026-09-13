@@ -939,7 +939,7 @@
   {
     "id": "nutsnews-backend-alert-synthetic",
     "title": "NutsNews Backend Alert and Synthetic Health",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1026,7 +1026,7 @@
   {
     "id": "nutsnews-backend-backups",
     "title": "NutsNews Backend Backups",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1073,7 +1073,7 @@
   {
     "id": "nutsnews-backend-caddy-edge",
     "title": "NutsNews Backend Caddy and Edge",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1184,7 +1184,7 @@
   {
     "id": "nutsnews-backend-docker-runtime",
     "title": "NutsNews Backend Docker and Runtime",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1223,7 +1223,7 @@
   {
     "id": "nutsnews-backend-host",
     "title": "NutsNews Backend Host Overview",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1294,13 +1294,13 @@
   {
     "id": "nutsnews-backend-logs",
     "title": "NutsNews Backend Logs",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": []
   },
   {
     "id": "nutsnews-backend-metrics-quota",
     "title": "NutsNews Backend Metrics Quota",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1339,7 +1339,7 @@
   {
     "id": "nutsnews-backend-os-updates",
     "title": "NutsNews Backend OS Updates",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1378,7 +1378,7 @@
   {
     "id": "nutsnews-backend-postgres-failover",
     "title": "NutsNews Backend PostgreSQL Failover",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1481,7 +1481,7 @@
   {
     "id": "nutsnews-backend-postgres-operations",
     "title": "NutsNews Backend PostgreSQL Operations",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1584,7 +1584,7 @@
   {
     "id": "nutsnews-backend-service-health",
     "title": "NutsNews Backend Service Health",
-    "application": "nutsnews",
+    "application": "backend-vps",
     "panels": [
       {
         "id": "1",
@@ -1734,7 +1734,7 @@
   {
     "id": "nutsnews-cpu-load-processes",
     "title": "NutsNews CPU Load Processes",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -1870,7 +1870,7 @@
   {
     "id": "nutsnews-disk-filesystem-io",
     "title": "NutsNews Disk Filesystem IO",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -1909,7 +1909,7 @@
   {
     "id": "nutsnews-docker-compose-containers",
     "title": "NutsNews Docker Compose Containers",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -2038,7 +2038,7 @@
   {
     "id": "nutsnews-logs-security-auth",
     "title": "NutsNews Logs Security Auth",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -2061,7 +2061,7 @@
   {
     "id": "nutsnews-memory-swap",
     "title": "NutsNews Memory Swap",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -2100,7 +2100,7 @@
   {
     "id": "nutsnews-network-caddy-edge",
     "title": "NutsNews Network Caddy Edge",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -2292,7 +2292,7 @@
   {
     "id": "nutsnews-systemd-services-timers",
     "title": "NutsNews Systemd Services Timers",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -2323,7 +2323,7 @@
   {
     "id": "nutsnews-vps-overview",
     "title": "NutsNews VPS Overview",
-    "application": "nutsnews",
+    "application": "nutsnews-vps",
     "panels": [
       {
         "id": "1",
@@ -2803,6 +2803,69 @@
         "unit": "s",
         "queries": [
           "time() - website_probe_last_check_timestamp_seconds{website=\"showalgo\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fantasy-website",
+    "title": "Fantasy Football Edge · website and database",
+    "application": "fantasy",
+    "panels": [
+      {
+        "id": "availability",
+        "title": "Availability · rolling hour",
+        "unit": "percent",
+        "queries": [
+          "100 * avg_over_time(website_probe_success{website=\"fantasy\"}[1h])"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "HTTPS response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"fantasy\"}"
+        ]
+      },
+      {
+        "id": "status",
+        "title": "HTTP status",
+        "unit": "short",
+        "queries": [
+          "website_probe_status_code{website=\"fantasy\"}"
+        ]
+      },
+      {
+        "id": "certificate",
+        "title": "TLS certificate remaining",
+        "unit": "s",
+        "queries": [
+          "website_probe_certificate_expiry_timestamp_seconds{website=\"fantasy\"} - time()"
+        ]
+      },
+      {
+        "id": "freshness",
+        "title": "Time since last check",
+        "unit": "s",
+        "queries": [
+          "time() - website_probe_last_check_timestamp_seconds{website=\"fantasy\"}"
+        ]
+      },
+      {
+        "id": "database",
+        "title": "Backend & database health",
+        "unit": "percent",
+        "queries": [
+          "100 * website_probe_success{website=\"fantasy-health\"}"
+        ]
+      },
+      {
+        "id": "database-latency",
+        "title": "Backend health response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"fantasy-health\"}"
         ]
       }
     ]
