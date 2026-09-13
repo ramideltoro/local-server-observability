@@ -15,6 +15,10 @@ export function publicRoute(method, pathname) {
   if (method === "POST") return pathname === "/api/ds/query";
   if (method !== "GET") return false;
   return (
+    /^\/apis\/dashboard\.grafana\.app\/$/.test(pathname) ||
+    /^\/apis\/dashboard\.grafana\.app\/v(?:1beta1|2beta1)\/namespaces\/default\/dashboards\/[a-zA-Z0-9_-]+(?:\/dto)?$/.test(
+      pathname,
+    ) ||
     /^\/(?:public\/|d\/|d-solo\/)/.test(pathname) ||
     [
       "/",
