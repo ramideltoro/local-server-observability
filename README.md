@@ -25,3 +25,5 @@ npm test
 Deployment is coordinated by [local-server-infra](https://github.com/ramideltoro/local-server-infra). Changes require matching wiki source fingerprints. Production Qwen inference is checked before and after activation; portal deployment does not restart Qwen or Ollama.
 
 Detailed operation, coverage limits, lifecycle and recovery belong in the [three-mode wiki](https://localserver.wiki.ramideltoro.com).
+
+Mookie is a separate Raspberry Pi server with a dedicated 21-panel resource/hardware dashboard and Google-protected journal view. Active fleet inventory excludes the retired Skyglow and Antenna Observatory applications; historical reports are retained.

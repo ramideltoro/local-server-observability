@@ -65,7 +65,9 @@ export function alertCatalog(
         id: createHash("sha256").update(r.uid).digest("hex").slice(0, 16),
         name: r.title,
         source: "Grafana Cloud",
-        system: /backend/i.test(r.title)
+        system: /mookie/i.test(r.title)
+          ? "mookie"
+          : /backend/i.test(r.title)
           ? "backend-vps"
           : /raspberry/i.test(r.title)
             ? "raspberry"
