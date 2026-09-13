@@ -166,3 +166,143 @@ publicMetrics.push(
     expr: 'pi_public_memory_available_bytes{project="raspberry"}',
   },
 );
+
+// Fixed host scope; public results strip all private labels.
+export const mookieMetrics = [
+  {
+    "id": "mookie-cpu",
+    "title": "CPU utilization",
+    "unit": "percent",
+    "expr": "100*(1-avg(rate(node_cpu_seconds_total{instance=\"mookie\",mode=\"idle\"}[5m])))",
+    "inspectionThreshold": 90
+  },
+  {
+    "id": "mookie-memory",
+    "title": "Memory used",
+    "unit": "percent",
+    "expr": "100*(1-max(node_memory_MemAvailable_bytes{instance=\"mookie\"})/max(node_memory_MemTotal_bytes{instance=\"mookie\"}))",
+    "inspectionThreshold": 90
+  },
+  {
+    "id": "mookie-disk",
+    "title": "Root disk used",
+    "unit": "percent",
+    "expr": "100*(1-max(node_filesystem_avail_bytes{instance=\"mookie\",mountpoint=\"/\"})/max(node_filesystem_size_bytes{instance=\"mookie\",mountpoint=\"/\"}))",
+    "inspectionThreshold": 85
+  },
+  {
+    "id": "mookie-load",
+    "title": "System load",
+    "unit": "short",
+    "expr": "max(node_load1{instance=\"mookie\"})"
+  },
+  {
+    "id": "mookie-availability",
+    "title": "Collector availability",
+    "unit": "percent",
+    "expr": "100*min(up{instance=\"mookie\",job=\"integrations/node_exporter\"})"
+  },
+  {
+    "id": "mookie-uptime",
+    "title": "Uptime",
+    "unit": "s",
+    "expr": "time()-max(node_boot_time_seconds{instance=\"mookie\"})"
+  },
+  {
+    "id": "mookie-temperature",
+    "title": "CPU temperature",
+    "unit": "celsius",
+    "expr": "max(mookie_temperature_celsius{instance=\"mookie\"})",
+    "inspectionThreshold": 80
+  },
+  {
+    "id": "mookie-undervoltage",
+    "title": "Undervoltage now",
+    "unit": "short",
+    "expr": "max(mookie_undervoltage{instance=\"mookie\"})",
+    "inspectionThreshold": 0
+  },
+  {
+    "id": "mookie-throttled",
+    "title": "Thermal throttling now",
+    "unit": "short",
+    "expr": "max(mookie_throttled{instance=\"mookie\"})",
+    "inspectionThreshold": 0
+  },
+  {
+    "id": "mookie-hardware-history",
+    "title": "Hardware warning since boot",
+    "unit": "short",
+    "expr": "max(mookie_hardware_warning_since_boot{instance=\"mookie\"})"
+  },
+  {
+    "id": "mookie-receive",
+    "title": "Network receive",
+    "unit": "Bps",
+    "expr": "sum(rate(node_network_receive_bytes_total{instance=\"mookie\",device!=\"lo\"}[5m]))"
+  },
+  {
+    "id": "mookie-transmit",
+    "title": "Network transmit",
+    "unit": "Bps",
+    "expr": "sum(rate(node_network_transmit_bytes_total{instance=\"mookie\",device!=\"lo\"}[5m]))"
+  },
+  {
+    "id": "mookie-disk-read",
+    "title": "Disk read throughput",
+    "unit": "Bps",
+    "expr": "sum(rate(node_disk_read_bytes_total{instance=\"mookie\",device=\"mmcblk0\"}[5m]))"
+  },
+  {
+    "id": "mookie-disk-write",
+    "title": "Disk write throughput",
+    "unit": "Bps",
+    "expr": "sum(rate(node_disk_written_bytes_total{instance=\"mookie\",device=\"mmcblk0\"}[5m]))"
+  },
+  {
+    "id": "mookie-iowait",
+    "title": "CPU I/O wait",
+    "unit": "percent",
+    "expr": "100*avg(rate(node_cpu_seconds_total{instance=\"mookie\",mode=\"iowait\"}[5m]))"
+  },
+  {
+    "id": "mookie-inodes",
+    "title": "Root inodes used",
+    "unit": "percent",
+    "expr": "100*(1-max(node_filesystem_files_free{instance=\"mookie\",mountpoint=\"/\"})/max(node_filesystem_files{instance=\"mookie\",mountpoint=\"/\"}))"
+  },
+  {
+    "id": "mookie-swap",
+    "title": "Swap used",
+    "unit": "percent",
+    "expr": "100*(1-max(node_memory_SwapFree_bytes{instance=\"mookie\"})/clamp_min(max(node_memory_SwapTotal_bytes{instance=\"mookie\"}),1))"
+  },
+  {
+    "id": "mookie-processes",
+    "title": "Processes",
+    "unit": "short",
+    "expr": "sum(node_processes_pids{instance=\"mookie\"})"
+  },
+  {
+    "id": "mookie-services-failed",
+    "title": "Failed services",
+    "unit": "short",
+    "expr": "sum(node_systemd_unit_state{instance=\"mookie\",state=\"failed\"})",
+    "inspectionThreshold": 0
+  },
+  {
+    "id": "mookie-restarts",
+    "title": "Service restarts over 1 hour",
+    "unit": "short",
+    "expr": "sum(increase(node_systemd_service_restart_total{instance=\"mookie\"}[1h]))",
+    "inspectionThreshold": 3
+  },
+  {
+    "id": "mookie-telemetry-age",
+    "title": "Hardware telemetry age",
+    "unit": "s",
+    "expr": "time()-max(mookie_collector_timestamp_seconds{instance=\"mookie\"})",
+    "inspectionThreshold": 180
+  }
+];
+publicMetrics.push(...mookieMetrics);

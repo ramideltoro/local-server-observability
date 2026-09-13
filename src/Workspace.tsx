@@ -487,7 +487,7 @@ export default function Workspace() {
             )}
             {selected && (
               <>
-                <h2>Applications</h2>
+                {selected.applications.length > 0 && <h2>Applications</h2>}
                 <div className="ws-link-list">
                   {selected.applications.map((id) => (
                     <a key={id} href={"#app/" + id}>
@@ -513,7 +513,9 @@ export default function Workspace() {
                       ? "node"
                       : selected?.id === "backend-vps"
                         ? "backend"
-                        : selected?.id === "raspberry"
+                        : selected?.id === "mookie"
+                          ? "mookie"
+                          : selected?.id === "raspberry"
                           ? "raspberry"
                           : app?.id || "nutsnews",
                   ),

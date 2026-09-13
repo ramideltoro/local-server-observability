@@ -83,6 +83,26 @@
       "limitation": "Application container hosting and telemetry selectors require verification"
     },
     {
+      "id": "mookie",
+      "name": "Mookie",
+      "applications": [],
+      "services": [
+        "alloy",
+        "ssh",
+        "avahi-daemon",
+        "NetworkManager",
+        "systemd-journald",
+        "systemd-timesyncd"
+      ],
+      "sources": [
+        "metrics",
+        "logs",
+        "hardware",
+        "service-exporter"
+      ],
+      "evidence": "Verified Raspberry Pi 4 Model B, Debian 13 arm64. GitHub deploys Alloy and hardware telemetry through the local-server SSH jump host."
+    },
+    {
       "id": "external",
       "name": "External hosting",
       "applications": [
@@ -95,18 +115,6 @@
       ],
       "evidence": "Public HTTPS endpoints; underlying hosting account not yet verified",
       "limitation": "Public probes measure availability, latency and TLS only"
-    },
-    {
-      "id": "unverified",
-      "name": "Hosting to verify",
-      "applications": [
-        "antenna",
-        "skyglow"
-      ],
-      "services": [],
-      "sources": [],
-      "evidence": "Requested systems; repository and deployment evidence are not yet accessible",
-      "limitation": "Antenna and Skyglow hosting has not been verified"
     }
   ],
   "applications": [
@@ -129,16 +137,6 @@
       "id": "fantasy",
       "name": "Fantasy Football Edge",
       "coverage": "HTTPS and backend/database health; importer and application error instrumentation missing"
-    },
-    {
-      "id": "antenna",
-      "name": "Antenna Observatory",
-      "coverage": "Raspberry telemetry discovery in progress"
-    },
-    {
-      "id": "skyglow",
-      "name": "Skyglow",
-      "coverage": "Raspberry telemetry discovery in progress"
     },
     {
       "id": "raspberry-observability",
