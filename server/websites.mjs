@@ -1,6 +1,18 @@
 import https from "node:https";
 export const websites = [
   {
+    id: "fantasy",
+    name: "Fantasy Football Edge",
+    description: "fantasy.ramideltoro.com · Website",
+    url: "https://fantasy.ramideltoro.com",
+  },
+  {
+    id: "fantasy-health",
+    name: "Fantasy backend & database",
+    description: "Database connectivity health check",
+    url: "https://fantasy.ramideltoro.com/healthz",
+  },
+  {
     id: "ramideltoro",
     name: "Rami Del Toro",
     description: "www.ramideltoro.com · HTTPS availability",

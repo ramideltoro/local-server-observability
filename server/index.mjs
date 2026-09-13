@@ -99,30 +99,41 @@ async function health(url) {
     return { status: "unavailable", latencyMs: null };
   }
 }
+async function mapBounded(items, fn) {
+  const results = new Array(items.length);
+  let next = 0;
+  await Promise.all(
+    Array.from({ length: Math.min(6, items.length) }, async () => {
+      while (next < items.length) {
+        const index = next++;
+        results[index] = await fn(items[index]);
+      }
+    }),
+  );
+  return results;
+}
 async function overview(range) {
   return cached("overview:" + range, async () => {
-    const metrics = await Promise.all(
-      publicMetrics.map(async (m) => {
-        try {
-          const series = publicSeries(await query(m.expr, range));
-          return {
-            id: m.id,
-            title: m.title,
-            unit: m.unit,
-            series,
-            state: metricState(series),
-          };
-        } catch {
-          return {
-            id: m.id,
-            title: m.title,
-            unit: m.unit,
-            series: [],
-            state: "unavailable",
-          };
-        }
-      }),
-    );
+    const metrics = await mapBounded(publicMetrics, async (m) => {
+      try {
+        const series = publicSeries(await query(m.expr, range));
+        return {
+          id: m.id,
+          title: m.title,
+          unit: m.unit,
+          series,
+          state: metricState(series),
+        };
+      } catch {
+        return {
+          id: m.id,
+          title: m.title,
+          unit: m.unit,
+          series: [],
+          state: "unavailable",
+        };
+      }
+    });
     const services = await Promise.all(
       [
         {
@@ -314,13 +325,20 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === "/api/owner/logs") {
       const w = windowFor(u.searchParams.get("range"));
-      const application =
-        u.searchParams.get("application") === "local" ? "local" : "nutsnews";
+      const application = ["local", "backend-vps", "nutsnews-vps"].includes(
+        u.searchParams.get("application"),
+      )
+        ? u.searchParams.get("application")
+        : "nutsnews";
       const term = (u.searchParams.get("search") || "").slice(0, 120);
       const selector =
         application === "local"
           ? '{instance="chingadera"}'
-          : '{instance=~"(vps|backend).nutsnews.com"}';
+          : application === "backend-vps"
+            ? '{instance="backend.nutsnews.com"}'
+            : application === "nutsnews-vps"
+              ? '{instance="vps.nutsnews.com"}'
+              : '{instance=~"(vps|backend).nutsnews.com"}';
       const p = new URLSearchParams({
         query: selector + (term ? " |= " + JSON.stringify(term) : ""),
         start: String(BigInt(w.start) * 1000000000n),

@@ -67,6 +67,9 @@ const menu = [
   { id: "applications", name: "Applications", icon: Layers },
   { id: "local", name: "Local server", icon: Server },
   { id: "nutsnews", name: "NutsNews", icon: Globe },
+  { id: "fantasy", name: "Fantasy Football Edge", icon: Globe },
+  { id: "backend-vps", name: "Backend VPS", icon: Server },
+  { id: "nutsnews-vps", name: "NutsNews VPS", icon: Server },
   { id: "ramideltoro", name: "Rami Del Toro", icon: Globe },
   { id: "showalgo", name: "ShowAlgo", icon: Globe },
   { id: "alerts", name: "Alerts", icon: Bell },
@@ -155,7 +158,7 @@ function Plot({
         {!compact && (
           <>
             <CartesianGrid
-              stroke="#ece8e0"
+              stroke="#393125"
               strokeDasharray="3 4"
               vertical={false}
             />
@@ -167,14 +170,14 @@ function Plot({
                   minute: "2-digit",
                 })
               }
-              tick={{ fontSize: 10, fill: "#8c8578" }}
+              tick={{ fontSize: 10, fill: "#b9ad98" }}
               axisLine={false}
               tickLine={false}
               minTickGap={40}
             />
             <YAxis
               width={52}
-              tick={{ fontSize: 10, fill: "#8c8578" }}
+              tick={{ fontSize: 10, fill: "#b9ad98" }}
               tickFormatter={(v) => format(v, metric.unit)}
               axisLine={false}
               tickLine={false}
@@ -186,7 +189,9 @@ function Plot({
               formatter={(v) => format(Number(v), metric.unit)}
               contentStyle={{
                 borderRadius: 10,
-                border: "1px solid #e7e0d2",
+                backgroundColor: "#211c15",
+                color: "#eee4d1",
+                border: "1px solid #5b4526",
                 fontSize: 12,
               }}
             />
@@ -383,8 +388,19 @@ function App() {
     (d) =>
       (tab === "local"
         ? d.application === "local"
-        : ["nutsnews", "ramideltoro", "showalgo"].includes(tab)
-          ? d.application === tab
+        : [
+              "nutsnews",
+              "ramideltoro",
+              "showalgo",
+              "fantasy",
+              "backend-vps",
+              "nutsnews-vps",
+            ].includes(tab)
+          ? tab === "nutsnews"
+            ? ["nutsnews", "backend-vps", "nutsnews-vps"].includes(
+                d.application,
+              )
+            : d.application === tab
           : tab === "backups"
             ? /backup|restore/i.test(d.title)
             : tab === "deployments"
@@ -420,7 +436,7 @@ function App() {
             >
               <Icon size={17} />
               <span>{name}</span>
-              {id === "overview" && <span className="nav-count">4</span>}
+              {id === "overview" && <span className="nav-count">7</span>}
               {["alerts", "logs", "traces"].includes(id) && !owner && (
                 <LockKeyhole size={11} />
               )}
@@ -546,6 +562,9 @@ function App() {
                 "overview",
                 "local",
                 "nutsnews",
+                "fantasy",
+                "backend-vps",
+                "nutsnews-vps",
                 "ramideltoro",
                 "showalgo",
                 "applications",
@@ -553,11 +572,13 @@ function App() {
                 <>
                   <div className="section-heading">
                     <h2>
-                      {["ramideltoro", "showalgo"].includes(tab)
+                      {["ramideltoro", "showalgo", "fantasy"].includes(tab)
                         ? "Website telemetry"
                         : tab === "nutsnews"
                           ? "Application resources"
-                          : "Local server at a glance"}
+                          : ["backend-vps", "nutsnews-vps"].includes(tab)
+                            ? "Host resources"
+                            : "Local server at a glance"}
                     </h2>
                     <span className="subtle">
                       {range === "1h"
@@ -566,8 +587,19 @@ function App() {
                     </span>
                   </div>
                   <section className="metric-grid">
-                    {(["nutsnews", "ramideltoro", "showalgo"].includes(tab)
-                      ? metrics.filter((m) => m.id.startsWith(tab))
+                    {([
+                      "nutsnews",
+                      "ramideltoro",
+                      "showalgo",
+                      "fantasy",
+                      "backend-vps",
+                      "nutsnews-vps",
+                    ].includes(tab)
+                      ? metrics.filter((m) =>
+                          m.id.startsWith(
+                            tab === "nutsnews" ? "nutsnews-" : tab + "-",
+                          ),
+                        )
                       : metrics.slice(0, 4)
                     ).map((m) => (
                       <MetricCard key={m.id} metric={m} />
@@ -583,6 +615,9 @@ function App() {
                 "overview",
                 "applications",
                 "nutsnews",
+                "fantasy",
+                "backend-vps",
+                "nutsnews-vps",
                 "ramideltoro",
                 "showalgo",
                 "local",
@@ -597,11 +632,19 @@ function App() {
                       .filter((s) =>
                         tab === "local"
                           ? s.id === "qwen"
-                          : ["ramideltoro", "showalgo"].includes(tab)
-                            ? s.id === tab
-                            : tab === "nutsnews"
-                              ? ["nutsnews", "backend", "qwen"].includes(s.id)
-                              : true,
+                          : ["ramideltoro", "showalgo", "fantasy"].includes(tab)
+                            ? tab === "fantasy"
+                              ? s.id.startsWith("fantasy")
+                              : s.id === tab
+                            : tab === "backend-vps"
+                              ? s.id === "backend"
+                              : tab === "nutsnews-vps"
+                                ? s.id === "nutsnews"
+                                : tab === "nutsnews"
+                                  ? ["nutsnews", "backend", "qwen"].includes(
+                                      s.id,
+                                    )
+                                  : true,
                       )
                       .map((s) => (
                         <article className="service-card" key={s.id}>
@@ -635,8 +678,10 @@ function App() {
                                   s.id === "qwen"
                                     ? "local"
                                     : s.id === "backend"
-                                      ? "nutsnews"
-                                      : s.id,
+                                      ? "backend-vps"
+                                      : s.id === "fantasy-health"
+                                        ? "fantasy"
+                                        : s.id,
                                 )
                               }
                             >
@@ -707,7 +752,7 @@ function App() {
               <small>Public health remains available without signing in.</small>
             </section>
           )}
-          {["ramideltoro", "showalgo"].includes(tab) && (
+          {["ramideltoro", "showalgo", "fantasy"].includes(tab) && (
             <p className="notice">
               HTTPS checks run every minute from the local server. Response time
               measures arrival of HTTP headers, not browser page speed.
@@ -717,13 +762,21 @@ function App() {
             </p>
           )}
           {!owner &&
-            ["local", "nutsnews", "ramideltoro", "showalgo"].includes(tab) && (
+            [
+              "local",
+              "nutsnews",
+              "ramideltoro",
+              "showalgo",
+              "fantasy",
+              "backend-vps",
+              "nutsnews-vps",
+            ].includes(tab) && (
               <div className="owner-callout">
                 <ShieldCheck size={21} />
                 <div>
                   <strong>Go deeper with owner access</strong>
                   <p>
-                    {["ramideltoro", "showalgo"].includes(tab)
+                    {["ramideltoro", "showalgo", "fantasy"].includes(tab)
                       ? "Inspect HTTPS availability, timing, certificate expiry, and collection freshness."
                       : "Explore service metrics, individual processes, worker stages, databases, and logs."}
                   </p>
@@ -824,6 +877,9 @@ function App() {
                   "overview",
                   "local",
                   "nutsnews",
+                  "fantasy",
+                  "backend-vps",
+                  "nutsnews-vps",
                   "ramideltoro",
                   "showalgo",
                   "applications",
@@ -855,8 +911,12 @@ function App() {
                             if (d.panelCount) setSelected(d.id);
                             else {
                               setLogApp(
-                                d.application === "local"
-                                  ? "local"
+                                [
+                                  "local",
+                                  "backend-vps",
+                                  "nutsnews-vps",
+                                ].includes(d.application)
+                                  ? d.application
                                   : "nutsnews",
                               );
                               navigate("logs");
@@ -932,7 +992,9 @@ function App() {
                           value={logApp}
                           onChange={(e) => setLogApp(e.target.value)}
                         >
-                          <option value="nutsnews">NutsNews</option>
+                          <option value="nutsnews">NutsNews · all hosts</option>
+                          <option value="backend-vps">Backend VPS</option>
+                          <option value="nutsnews-vps">NutsNews VPS</option>
                           <option value="local">Local server</option>
                         </select>
                         <input
