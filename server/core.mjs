@@ -81,3 +81,33 @@ export const publicMetrics = [
     expr: "sum(rabbitmq_queue_messages_ready)",
   },
 ];
+
+for (const id of ["ramideltoro", "showalgo"]) {
+  for (const [metric, title, unit, expr] of [
+    [
+      "availability",
+      "Availability",
+      "percent",
+      `100 * avg_over_time(website_probe_success{website="${id}"}[1h])`,
+    ],
+    [
+      "latency",
+      "HTTPS response time",
+      "s",
+      `website_probe_duration_seconds{website="${id}"}`,
+    ],
+    [
+      "status",
+      "HTTP status",
+      "short",
+      `website_probe_status_code{website="${id}"}`,
+    ],
+    [
+      "certificate",
+      "Certificate remaining",
+      "s",
+      `website_probe_certificate_expiry_timestamp_seconds{website="${id}"} - time()`,
+    ],
+  ])
+    publicMetrics.push({ id: `${id}-${metric}`, title, unit, expr });
+}

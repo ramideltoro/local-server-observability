@@ -2712,5 +2712,99 @@
         ]
       }
     ]
+  },
+  {
+    "id": "ramideltoro-website",
+    "title": "Rami Del Toro website HTTPS telemetry",
+    "application": "ramideltoro",
+    "panels": [
+      {
+        "id": "availability",
+        "title": "Availability · rolling hour",
+        "unit": "percent",
+        "queries": [
+          "100 * avg_over_time(website_probe_success{website=\"ramideltoro\"}[1h])"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "HTTPS response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"ramideltoro\"}"
+        ]
+      },
+      {
+        "id": "status",
+        "title": "HTTP status",
+        "unit": "short",
+        "queries": [
+          "website_probe_status_code{website=\"ramideltoro\"}"
+        ]
+      },
+      {
+        "id": "certificate",
+        "title": "TLS certificate remaining",
+        "unit": "s",
+        "queries": [
+          "website_probe_certificate_expiry_timestamp_seconds{website=\"ramideltoro\"} - time()"
+        ]
+      },
+      {
+        "id": "freshness",
+        "title": "Time since last check",
+        "unit": "s",
+        "queries": [
+          "time() - website_probe_last_check_timestamp_seconds{website=\"ramideltoro\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "showalgo-website",
+    "title": "ShowAlgo website HTTPS telemetry",
+    "application": "showalgo",
+    "panels": [
+      {
+        "id": "availability",
+        "title": "Availability · rolling hour",
+        "unit": "percent",
+        "queries": [
+          "100 * avg_over_time(website_probe_success{website=\"showalgo\"}[1h])"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "HTTPS response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"showalgo\"}"
+        ]
+      },
+      {
+        "id": "status",
+        "title": "HTTP status",
+        "unit": "short",
+        "queries": [
+          "website_probe_status_code{website=\"showalgo\"}"
+        ]
+      },
+      {
+        "id": "certificate",
+        "title": "TLS certificate remaining",
+        "unit": "s",
+        "queries": [
+          "website_probe_certificate_expiry_timestamp_seconds{website=\"showalgo\"} - time()"
+        ]
+      },
+      {
+        "id": "freshness",
+        "title": "Time since last check",
+        "unit": "s",
+        "queries": [
+          "time() - website_probe_last_check_timestamp_seconds{website=\"showalgo\"}"
+        ]
+      }
+    ]
   }
 ]

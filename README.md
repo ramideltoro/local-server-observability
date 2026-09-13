@@ -4,7 +4,7 @@ A central observability portal for the local server and NutsNews, available at [
 
 ## Experience
 
-Public pages show allowlisted endpoint health and aggregate resource metrics. The authenticated owner workspace adds 39 curated dashboards with 291 panels, bounded log search, alerts, trace availability, backups, and deployment diagnostics. Time ranges, freshness labels, and service-level navigation help distinguish an actual failure from missing evidence.
+Public pages show allowlisted endpoint health and aggregate resource metrics. The authenticated owner workspace adds 41 curated dashboards with 301 panels, bounded log search, alerts, trace availability, backups, and deployment diagnostics. Time ranges, freshness labels, and service-level navigation help distinguish an actual failure from missing evidence.
 
 ## Architecture
 
@@ -37,3 +37,7 @@ The [wiki](https://localserver.wiki.ramideltoro.com) contains Summary, Technical
 ## Google owner sign-in
 
 Owner links go directly to Google OAuth. Register `https://observe.ramideltoro.com/auth/google/callback` on the web OAuth client. Supply `AUTH_GOOGLE_ID`, `AUTH_GOOGLE_SECRET`, a random `SESSION_SECRET` of at least 32 bytes, and `OWNER_EMAILS` through the infrastructure runtime secret. Only verified Google emails on that allowlist receive a 12-hour Secure, HttpOnly session. State, PKCE, and nonce protect the one-use callback. Login returns to the selected diagnostics tab; expired sessions prompt a new sign-in. Cloudflare still carries tunnel traffic and protects deployment SSH, but is not the portal identity provider.
+
+## Website telemetry
+
+Dedicated Rami Del Toro and ShowAlgo views monitor `https://www.ramideltoro.com` and `https://www.showalgo.com` every 60 seconds from the local server. HTTPS probes validate certificates, measure time to headers, record HTTP status and certificate expiry, and export bounded Prometheus metrics through the existing Alloy scrape. Checks run without browser traffic, have an 8-second deadline, do not follow redirects, and discard response bodies. Historical panels include rolling-hour availability, response time, HTTP status, TLS lifetime, and collection freshness. No visitor tracking or provider-specific logs are collected.
