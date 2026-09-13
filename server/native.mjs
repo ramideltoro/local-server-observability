@@ -25,6 +25,7 @@ export function publicRoute(method, pathname) {
       "/api/frontend/settings",
       "/api/health",
       "/api/search",
+      "/api/folders",
       "/api/user",
       "/api/user/preferences",
       "/api/org",
@@ -33,7 +34,7 @@ export function publicRoute(method, pathname) {
       "/api/plugins",
       "/api/annotations",
     ].includes(pathname) ||
-    /^\/api\/(?:dashboards\/uid\/[a-zA-Z0-9_-]+|datasources\/uid\/[a-zA-Z0-9_-]+|plugins\/[a-zA-Z0-9_-]+\/settings)$/.test(
+    /^\/api\/(?:folders\/[a-zA-Z0-9_-]+|dashboards\/uid\/[a-zA-Z0-9_-]+|datasources\/uid\/[a-zA-Z0-9_-]+|plugins\/[a-zA-Z0-9_-]+\/settings)$/.test(
       pathname,
     )
   );
