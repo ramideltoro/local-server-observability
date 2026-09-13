@@ -10,6 +10,7 @@ export function publicRoute(method,pathname){
 export async function proxyGrafana(req,res,url,isOwner){
   const prefix=isOwner?'/owner/grafana':'/grafana';
   const route=url.pathname.slice(prefix.length)||'/';
+  if(/%|\\|\.\./.test(route)){res.writeHead(400);return res.end('Invalid path');}
   if(!isOwner&&!publicRoute(req.method,route)){res.writeHead(403);return res.end('Public Grafana is read-only');}
   if(isOwner&&!['GET','HEAD'].includes(req.method)&&req.headers.origin!=='https://observe.ramideltoro.com'){res.writeHead(403);return res.end('Invalid origin');}
   const payload=await body(req);
