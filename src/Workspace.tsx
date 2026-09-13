@@ -59,6 +59,12 @@ type Report = {
   at: string;
   summary: string;
   delaySeconds: number;
+  trigger?: string;
+  schedule?: {
+    scheduledFor: string;
+    scheduleDelaySeconds: number;
+    missedWindows: number;
+  };
   checks: {
     system: string;
     id: string;
@@ -66,7 +72,7 @@ type Report = {
     note: string;
     failures: unknown[];
   }[];
-  ai: { note: string };
+  ai: { note: string; summary?:string; evidence?:{id:string,system:string,check:string}[] };
 };
 type Rule = {
   id: string;
@@ -649,6 +655,18 @@ export default function Workspace() {
                   </small>
                 </summary>
                 <p>{r.summary}</p>
+                {r.schedule && (
+                  <p>
+                    {r.trigger === "schedule" ? "Scheduled run" : "Manual run"}{" "}
+                    · latest scheduled slot {when(r.schedule.scheduledFor)}
+                    {r.trigger === "schedule"
+                      ? " · started " +
+                        Math.round(r.schedule.scheduleDelaySeconds / 60) +
+                        " minutes late"
+                      : ""}{" "}
+                    · {r.schedule.missedWindows} missed daily windows
+                  </p>
+                )}
                 {r.delaySeconds > 0 && (
                   <p>
                     Inspection window delay: {Math.round(r.delaySeconds / 60)}{" "}
@@ -656,6 +674,7 @@ export default function Workspace() {
                   </p>
                 )}
                 <p>{r.ai.note}</p>
+                {r.ai.summary && <blockquote>{r.ai.summary}<p>{r.ai.evidence?.map(e=>`${e.id}: ${e.system} / ${e.check}`).join(' · ')}</p></blockquote>}
                 <div className="ws-checks">
                   {r.checks.map((c, i) => (
                     <div key={i}>
@@ -735,6 +754,8 @@ export default function Workspace() {
                   </summary>
                   <p>{r.purpose}</p>
                   <dl>
+                    <dt>Monitored signal</dt>
+                    <dd>{r.signal}</dd>
                     <dt>Evaluates every</dt>
                     <dd>
                       {r.intervalSeconds === null

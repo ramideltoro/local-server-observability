@@ -82,3 +82,29 @@ test("Grafana stable and beta read APIs are supported without writes", () => {
     assert.equal(publicRoute("POST", path), false);
   }
 });
+test("healthy silenced rules stay enabled and no-data remains distinct", () => {
+  const config = [
+    { uid: "r", title: "CPU", labels: { severity: "warning" }, data: [] },
+  ];
+  const groups = {
+    data: {
+      groups: [
+        {
+          interval: 60,
+          rules: [{ uid: "r", state: "inactive", health: "nodata" }],
+        },
+      ],
+    },
+  };
+  const r = alertCatalog(config, groups, [], "2026-09-13", [
+    {
+      status: { state: "active" },
+      matchers: [
+        { name: "alertname", value: "CPU", isEqual: true, isRegex: false },
+      ],
+    },
+  ]).rules[0];
+  assert.equal(r.silenced, true);
+  assert.equal(r.enabled, true);
+  assert.equal(r.state, "no-data");
+});
