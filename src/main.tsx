@@ -67,6 +67,8 @@ const menu = [
   { id: "applications", name: "Applications", icon: Layers },
   { id: "local", name: "Local server", icon: Server },
   { id: "nutsnews", name: "NutsNews", icon: Globe },
+  { id: "ramideltoro", name: "Rami Del Toro", icon: Globe },
+  { id: "showalgo", name: "ShowAlgo", icon: Globe },
   { id: "alerts", name: "Alerts", icon: Bell },
   { id: "logs", name: "Logs", icon: Terminal },
   { id: "traces", name: "Traces", icon: Workflow },
@@ -381,8 +383,8 @@ function App() {
     (d) =>
       (tab === "local"
         ? d.application === "local"
-        : tab === "nutsnews"
-          ? d.application === "nutsnews"
+        : ["nutsnews", "ramideltoro", "showalgo"].includes(tab)
+          ? d.application === tab
           : tab === "backups"
             ? /backup|restore/i.test(d.title)
             : tab === "deployments"
@@ -418,7 +420,7 @@ function App() {
             >
               <Icon size={17} />
               <span>{name}</span>
-              {id === "overview" && <span className="nav-count">2</span>}
+              {id === "overview" && <span className="nav-count">4</span>}
               {["alerts", "logs", "traces"].includes(id) && !owner && (
                 <LockKeyhole size={11} />
               )}
@@ -540,15 +542,22 @@ function App() {
                   </small>
                 </div>
               </section>
-              {["overview", "local", "nutsnews", "applications"].includes(
-                tab,
-              ) && (
+              {[
+                "overview",
+                "local",
+                "nutsnews",
+                "ramideltoro",
+                "showalgo",
+                "applications",
+              ].includes(tab) && (
                 <>
                   <div className="section-heading">
                     <h2>
-                      {tab === "nutsnews"
-                        ? "Application resources"
-                        : "Local server at a glance"}
+                      {["ramideltoro", "showalgo"].includes(tab)
+                        ? "Website telemetry"
+                        : tab === "nutsnews"
+                          ? "Application resources"
+                          : "Local server at a glance"}
                     </h2>
                     <span className="subtle">
                       {range === "1h"
@@ -557,8 +566,8 @@ function App() {
                     </span>
                   </div>
                   <section className="metric-grid">
-                    {(tab === "nutsnews"
-                      ? metrics.filter((m) => m.id.startsWith("nutsnews"))
+                    {(["nutsnews", "ramideltoro", "showalgo"].includes(tab)
+                      ? metrics.filter((m) => m.id.startsWith(tab))
                       : metrics.slice(0, 4)
                     ).map((m) => (
                       <MetricCard key={m.id} metric={m} />
@@ -570,9 +579,14 @@ function App() {
                   </section>
                 </>
               )}
-              {["overview", "applications", "nutsnews", "local"].includes(
-                tab,
-              ) && (
+              {[
+                "overview",
+                "applications",
+                "nutsnews",
+                "ramideltoro",
+                "showalgo",
+                "local",
+              ].includes(tab) && (
                 <>
                   <div className="section-heading">
                     <h2>Your applications</h2>
@@ -580,7 +594,15 @@ function App() {
                   </div>
                   <section className="service-grid">
                     {services
-                      .filter((s) => (tab === "local" ? s.id === "qwen" : true))
+                      .filter((s) =>
+                        tab === "local"
+                          ? s.id === "qwen"
+                          : ["ramideltoro", "showalgo"].includes(tab)
+                            ? s.id === tab
+                            : tab === "nutsnews"
+                              ? ["nutsnews", "backend", "qwen"].includes(s.id)
+                              : true,
+                      )
                       .map((s) => (
                         <article className="service-card" key={s.id}>
                           <div className="service-top">
@@ -609,7 +631,13 @@ function App() {
                             <button
                               aria-label={"Explore " + s.name}
                               onClick={() =>
-                                navigate(s.id === "qwen" ? "local" : "nutsnews")
+                                navigate(
+                                  s.id === "qwen"
+                                    ? "local"
+                                    : s.id === "backend"
+                                      ? "nutsnews"
+                                      : s.id,
+                                )
                               }
                             >
                               <ArrowUpRight size={19} />
@@ -679,26 +707,37 @@ function App() {
               <small>Public health remains available without signing in.</small>
             </section>
           )}
-          {!owner && ["local", "nutsnews"].includes(tab) && (
-            <div className="owner-callout">
-              <ShieldCheck size={21} />
-              <div>
-                <strong>Go deeper with owner access</strong>
-                <p>
-                  Explore service metrics, individual processes, worker stages,
-                  databases, and logs.
-                </p>
-              </div>
-              <a
-                href={
-                  "/auth/google?returnTo=" +
-                  encodeURIComponent("/owner/#" + tab)
-                }
-              >
-                Open diagnostics <ArrowUpRight size={15} />
-              </a>
-            </div>
+          {["ramideltoro", "showalgo"].includes(tab) && (
+            <p className="notice">
+              HTTPS checks run every minute from the local server. Response time
+              measures arrival of HTTP headers, not browser page speed.
+              Availability is a rolling one-hour measure over collected samples.
+              Visitor analytics, application logs, and hosting resource metrics
+              are not connected.
+            </p>
           )}
+          {!owner &&
+            ["local", "nutsnews", "ramideltoro", "showalgo"].includes(tab) && (
+              <div className="owner-callout">
+                <ShieldCheck size={21} />
+                <div>
+                  <strong>Go deeper with owner access</strong>
+                  <p>
+                    {["ramideltoro", "showalgo"].includes(tab)
+                      ? "Inspect HTTPS availability, timing, certificate expiry, and collection freshness."
+                      : "Explore service metrics, individual processes, worker stages, databases, and logs."}
+                  </p>
+                </div>
+                <a
+                  href={
+                    "/auth/google?returnTo=" +
+                    encodeURIComponent("/owner/#" + tab)
+                  }
+                >
+                  Open diagnostics <ArrowUpRight size={15} />
+                </a>
+              </div>
+            )}
           {owner && tab === "local" && host && !selected && (
             <section className="records-panel">
               <div className="section-heading">
@@ -785,6 +824,8 @@ function App() {
                   "overview",
                   "local",
                   "nutsnews",
+                  "ramideltoro",
+                  "showalgo",
                   "applications",
                   "backups",
                   "deployments",
@@ -827,7 +868,7 @@ function App() {
                             <span>
                               {d.application === "local"
                                 ? "LOCAL SERVER"
-                                : "NUTSNEWS"}
+                                : d.application.toUpperCase()}
                             </span>
                           </div>
                           <h3>{d.title.replace(/^NutsNews /, "")}</h3>

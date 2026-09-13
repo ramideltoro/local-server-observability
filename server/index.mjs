@@ -1,4 +1,6 @@
 import http from "node:http";
+import { startWebsiteMonitor } from "./websites.mjs";
+const websiteMonitor = startWebsiteMonitor();
 import { snapshot, metrics as collectorMetrics } from "./collector.mjs";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -151,7 +153,7 @@ async function overview(range) {
     return {
       updatedAt: new Date().toISOString(),
       metrics,
-      services,
+      services: [...services, ...websiteMonitor.services()],
       release: release.portal?.slice(0, 12) || "development",
     };
   });
@@ -422,7 +424,11 @@ const metricsServer = http.createServer(async (req, res) => {
   }
   try {
     res.setHeader("Content-Type", "text/plain; version=0.0.4");
-    res.end(await cached("collector", collectorMetrics, 15000));
+    res.end(
+      (await cached("collector", collectorMetrics, 15000)) +
+        "\n" +
+        websiteMonitor.metrics(),
+    );
   } catch {
     res.writeHead(503);
     res.end("Collector unavailable");
