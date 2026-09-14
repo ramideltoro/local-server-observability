@@ -233,6 +233,7 @@ export default function Workspace() {
     "Fleet overview";
   const nav = (id: string, label: string, Icon = ChevronRight) => (
     <a
+      key={id}
       className={page === id ? "selected" : ""}
       aria-current={page === id ? "page" : undefined}
       href={"#" + id}
