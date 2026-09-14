@@ -94,6 +94,8 @@ export async function createOperations({
     await fs.readFile(root + "/config/operations.json", "utf8"),
   );
   const store = openOperations(dir);
+  if (!store.get("operationsInitializedAt"))
+    store.put("operationsInitializedAt", Date.now());
   let running = false,
     lastRules = { rules: [] },
     lastOverview = { metrics: [], services: [] };
@@ -633,7 +635,8 @@ export async function createOperations({
           if (
             repository.repo === "ramideltoro/local-server-infra" &&
             run.name === "Daily fleet inspection" &&
-            run.conclusion === "success"
+            run.conclusion === "success" &&
+            at >= store.get("operationsInitializedAt")
           ) {
             const old = store.get("workspaceRecovery");
             if (!old || at > old.at)
