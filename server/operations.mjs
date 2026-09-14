@@ -709,25 +709,38 @@ export async function createOperations({
           ),
         ),
       };
-    if (Date.now() - Date.parse(data.at) > 300000)
+    if (Date.now() - Date.parse(data.at) > 300000) {
+      const systems = config.systems.map((system) =>
+        scoreSystem(
+          system,
+          (
+            data.systems.find((s) => s.id === system.id)?.checks ||
+            system.checks
+          ).map((check) => ({
+            ...check,
+            status: ["fail", "warning"].includes(check.status)
+              ? check.status
+              : "unknown",
+            fresh: false,
+            note: "Collector stale; prior failures remain unverified until collection completes",
+          })),
+        ),
+      );
       return {
         ...data,
         stale: true,
-        score: 0,
         coverage: 0,
-        systems: config.systems.map((s) =>
-          scoreSystem(
-            s,
-            s.checks.map((c) =>
-              baseCheck(c, {
-                status: "unknown",
-                fresh: false,
-                note: "Collector stale; previous score is in history",
-              }),
-            ),
-          ),
+        score: Math.floor(
+          systems.reduce((n, s) => n + s.score, 0) / systems.length,
+        ),
+        systems,
+        critical: systems.flatMap((s) =>
+          s.deductions
+            .filter((c) => c.severity === "critical" && c.status === "fail")
+            .map((c) => ({ system: s.id, ...c })),
         ),
       };
+    }
     return data;
   }
   async function handle(req, res, u) {
