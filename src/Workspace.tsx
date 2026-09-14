@@ -13,6 +13,7 @@ import {
   Bell,
 } from "lucide-react";
 import "./workspace.css";
+import { latestMetric, resourceHealth, endpointHealth } from "./health";
 type Metric = {
   id: string;
   title: string;
@@ -204,7 +205,16 @@ export default function Workspace() {
     document.addEventListener("keydown", key);
     return () => document.removeEventListener("keydown", key);
   }, [drawer]);
-  const active = issues?.filter((i) => i.status !== "Remediated") || [],
+  const fresh = !!overview && !error && Date.now() - Date.parse(overview.updatedAt) < 300000;
+  const resources = (id: string) => ["cpu", "memory", "disk"].map((key) =>
+    overview?.metrics.find((metric) => metric.id === (id === "local" ? key : id + "-" + key)));
+  const hosts = inventory?.servers.filter((server) => server.services.length > 0) || [];
+  const hostHealth = (id: string) => fresh ? resourceHealth(resources(id)) : "unknown";
+  const goodHosts = hosts.filter((host) => hostHealth(host.id) === "good").length;
+  const badHosts = hosts.filter((host) => hostHealth(host.id) === "bad").length;
+  const endpointFailures = overview?.services.filter((service) => endpointHealth(service.status, fresh) === "bad") || [];
+  const goodEndpoints = overview?.services.filter((service) => endpointHealth(service.status, fresh) === "good").length || 0;
+  const active = issues?.filter((i) => i.status !== "Remediated").sort((a, b) => (a.severity === "critical" ? 0 : 1) - (b.severity === "critical" ? 0 : 1)) || [],
     selected = inventory?.servers.find((s) => page === "server/" + s.id),
     app = inventory?.applications.find((a) => page === "app/" + a.id),
     dashboard = catalog?.dashboards.find((d) => page === "dashboard/" + d.id);
@@ -366,6 +376,28 @@ export default function Workspace() {
         {error && <p className="ws-warning">{error}</p>}
         {page === "overview" && (
           <>
+            <section className="ws-health" aria-labelledby="health-title">
+              <div className="ws-health-heading">
+                <div>
+                  <p className="ws-eyebrow">SYSTEM HEALTH</p>
+                  <h2 id="health-title">{!inventory || !overview || !fresh ? "Waiting for current signals" : endpointFailures.length || badHosts ? "Your fleet needs attention" : goodHosts < hosts.length ? "Healthy signals. Coverage gaps." : "All core checks passing"}</h2>
+                  <p>Live endpoint checks and server resource pressure. Daily findings appear below.</p>
+                </div>
+                <Activity size={30} aria-hidden="true" />
+              </div>
+              <div className="ws-health-totals">
+                <div className="ws-tone-good"><strong>{fresh ? goodEndpoints : "—"}<small> / {overview?.services.length ?? "—"}</small></strong><span>Endpoints passing</span></div>
+                <div className={endpointFailures.length || badHosts ? "ws-tone-bad" : "ws-tone-good"}><strong>{fresh ? endpointFailures.length + badHosts : "—"}</strong><span>Failing core checks</span></div>
+                <div className="ws-tone-good"><strong>{fresh ? goodHosts : "—"}<small> / {inventory ? hosts.length : "—"}</small></strong><span>Servers within limits</span></div>
+                <div className="ws-tone-unknown"><strong>{inventory ? hosts.length - goodHosts - badHosts : "—"}</strong><span>Servers unverified</span></div>
+              </div>
+              <div className="ws-endpoints" aria-label="Endpoint health">
+                {overview?.services.map((service) => <a key={service.id} className={"ws-endpoint ws-tone-" + endpointHealth(service.status, fresh)} href={"#app/" + (service.id === "backend" ? "nutsnews" : service.id === "fantasy-health" ? "fantasy" : service.id)}>
+                  <span className="ws-status-dot" aria-hidden="true" />
+                  <span>{service.name}</span><small>{endpointHealth(service.status, fresh) === "good" ? "Passing" : endpointHealth(service.status, fresh) === "bad" ? "Failing" : "Unverified"}</small>
+                </a>)}
+              </div>
+            </section>
             <div className="ws-summary">
               <span>
                 <strong>
@@ -379,7 +411,7 @@ export default function Workspace() {
                 applications
               </span>
               <a href="#issues">
-                <strong>{active.length}</strong> current issues
+                <strong>{issues ? active.length : "—"}</strong> current issues
               </a>
               <a href="#dashboards">
                 <strong>{catalog?.dashboards.length || "—"}</strong> dashboards
@@ -390,7 +422,7 @@ export default function Workspace() {
                 <h2>Needs attention</h2>
                 {active.slice(0, 3).map((i) => (
                   <a key={i.id} href="#issues">
-                    <span className="ws-dot" />
+                    <span className={"ws-dot " + (i.severity === "critical" ? "ws-dot-bad" : "")} />
                     {i.summary}
                     <small>
                       {i.system} · {i.status}
@@ -401,8 +433,8 @@ export default function Workspace() {
             )}
             <section>
               <div className="ws-section-title">
-                <h2>Your systems</h2>
-                <span>CPU · memory · disk</span>
+                <h2>Infrastructure</h2>
+                <span>Current utilization · select a system to investigate</span>
               </div>
               <div className="ws-fleet">
                 {inventory?.servers.map((s) => (
@@ -410,6 +442,7 @@ export default function Workspace() {
                     <div>
                       <a className="ws-server-name" href={"#server/" + s.id}>
                         {s.name}
+                        {s.services.length > 0 && <span className={"ws-status ws-tone-" + hostHealth(s.id)}><span className="ws-status-dot" />{hostHealth(s.id) === "good" ? "Within limits" : hostHealth(s.id) === "bad" ? "Resource pressure" : "Unverified"}</span>}
                         <ChevronRight size={16} />
                       </a>
                       <div className="ws-app-links">
@@ -420,11 +453,11 @@ export default function Workspace() {
                             {overview?.services.find(
                               (service) => service.id === id,
                             ) && (
-                              <small className="ws-app-health">
+                              <small className={"ws-app-health ws-tone-" + endpointHealth(overview.services.find((service) => service.id === id)?.status || "", fresh)}>
                                 {
-                                  overview.services.find(
+                                  fresh ? overview.services.find(
                                     (service) => service.id === id,
-                                  )?.status
+                                  )?.status : "unverified"
                                 }
                               </small>
                             )}
@@ -453,8 +486,9 @@ export default function Workspace() {
                           );
                           return (
                             <div key={k}>
-                              <strong>{value(m)}</strong>
+                              <strong className={"ws-tone-" + (!fresh || latestMetric(m) === null ? "unknown" : latestMetric(m)! >= (k === "disk" ? 85 : 90) ? "bad" : "good")}>{fresh && latestMetric(m) !== null ? latestMetric(m)!.toLocaleString(undefined, { maximumFractionDigits: 1 }) + "%" : "—"}</strong>
                               <small>{k}</small>
+                              <span className="ws-resource-track" aria-hidden="true"><span style={{ width: (fresh ? Math.min(100, Math.max(0, latestMetric(m) ?? 0)) : 0) + "%", background: latestMetric(m)! >= (k === "disk" ? 85 : 90) ? "var(--bad)" : "var(--good)" }} /></span>
                             </div>
                           );
                         })}
