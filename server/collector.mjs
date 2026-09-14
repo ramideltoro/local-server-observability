@@ -125,6 +125,13 @@ export async function metrics() {
   } catch {
     out.push("local_server_qwen_health 0");
   }
+  try {
+    const state=JSON.parse(await fs.readFile("/var/lib/local-server-observability/state.json","utf8"));
+    const attempts=(state.reports||[]).map(r=>r.ai).filter(a=>a?.attempted);
+    out.push('local_qwen_background_requests_total '+attempts.length);
+    out.push('local_qwen_background_errors_total '+attempts.filter(a=>a.mode!=="qwen").length);
+    out.push('local_qwen_background_duration_seconds_sum '+attempts.reduce((n,a)=>n+(a.durationMs||0)/1000,0));
+  } catch {}
   out.push(`local_server_collector_timestamp_seconds ${Date.now() / 1000}`);
   return out.join("\n") + "\n";
 }

@@ -1,3 +1,5 @@
+import { createOperations } from "./operations.mjs";
+import { alertCatalog } from "./alerts.mjs";
 import { workspace } from "./workspace.mjs";
 import { startGateway } from "./native.mjs";
 import http from "node:http";
@@ -80,7 +82,7 @@ async function query(expr, range, uid = prom) {
     return (j.data?.result || []).slice(0, 24);
   });
 }
-const { owner, handle: handleAuth } = createGoogleAuth(env);
+const { owner, identity, handle: handleAuth } = createGoogleAuth(env);
 function json(res, code, data, privateData = false) {
   res.writeHead(code, {
     "Content-Type": "application/json",
@@ -231,7 +233,12 @@ async function dashboard(id, range) {
   }
   return { ...d, panels };
 }
-const handleWorkspace = workspace({ owner, grafana, json, cached, root });
+const loadRules = () => cached("operations-rules", async () => {
+ const [config, groups, alerts, silences] = await Promise.all([grafana("/api/v1/provisioning/alert-rules"),grafana("/api/prometheus/grafana/api/v1/rules"),grafana("/api/alertmanager/grafana/api/v2/alerts"),grafana("/api/alertmanager/grafana/api/v2/silences")]);
+ return alertCatalog(config,groups,alerts,new Date().toISOString(),silences);
+},60000);
+const operations = await createOperations({root,overview,query,rules:loadRules,owner,identity,json,release,disabled:env.OPERATIONS_DISABLED === "true"});
+const handleWorkspace = workspace({ owner, grafana, json, cached, root, operations });
 startGateway(env);
 const rates = new Map();
 const server = http.createServer(async (req, res) => {
@@ -276,7 +283,7 @@ const server = http.createServer(async (req, res) => {
       return json(res, 200, release);
     }
     if (pathname === "/api/public/overview")
-      return json(res, 200, await overview(u.searchParams.get("range")));
+      return json(res, 200, { ...await overview(u.searchParams.get("range")), health: operations.health() });
     if (pathname.startsWith("/api/owner/") || pathname.startsWith("/owner")) {
       if (!(await owner(req))) {
         if (pathname.startsWith("/api/"))

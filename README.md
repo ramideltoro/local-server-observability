@@ -27,3 +27,9 @@ Deployment is coordinated by [local-server-infra](https://github.com/ramideltoro
 Detailed operation, coverage limits, lifecycle and recovery belong in the [three-mode wiki](https://localserver.wiki.ramideltoro.com).
 
 Mookie is a separate Raspberry Pi server with a dedicated 21-panel resource/hardware dashboard and Google-protected journal view. Active fleet inventory excludes the retired Skyglow and Antenna Observatory applications; historical reports are retained.
+
+## Operational health workspace
+
+The portal provides explainable 0–100 verified health and coverage for every canonical system, deployment events, dependencies, objectives, Qwen workload telemetry, capacity estimates, incidents, recovery readiness, command search, owner favorites, and shared time ranges. Missing evidence remains visible and reduces verified health. Minute collection and daily 09:00 UTC inspection preserve history in an additive SQLite database with encrypted backup verification.
+
+See the [health guide](https://localserver.wiki.ramideltoro.com/technical/verified-health/), [workspace guide](https://localserver.wiki.ramideltoro.com/technical/operational-workspace/), and [storage recovery guide](https://localserver.wiki.ramideltoro.com/expert/operational-storage/) for scoring, scope, limitations, and recovery. Google authentication protects all changes; deployment remains GitHub-managed. Qwen instrumentation preserves production routing and uses an idle-gated wrapper upgrade with compatibility checks.

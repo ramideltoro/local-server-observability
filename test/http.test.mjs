@@ -1,12 +1,16 @@
+import { mkdtempSync, rmSync } from "node:fs";
+import os from "node:os";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 test("HTTP public shell and owner API boundary", async () => {
+  const dataDir = mkdtempSync(os.tmpdir()+"/observe-http-");
   const child = spawn(process.execPath, ["server/index.mjs"], {
     env: {
       ...process.env,
       PORT: "14310",
-      METRICS_PORT: "14311",
+      DATA_DIR: dataDir, OPERATIONS_DISABLED: "true",
+      METRICS_PORT: "14311", GATEWAY_PORT:"14312",
       ACCESS_ISSUER: "",
       ACCESS_AUDIENCE: "",
     },
@@ -34,6 +38,7 @@ test("HTTP public shell and owner API boundary", async () => {
     });
     assert.equal(write.status, 405);
   } finally {
-    child.kill("SIGTERM");
+    if(child.exitCode===null){const exited=new Promise(resolve=>child.once("exit",resolve));child.kill("SIGTERM");await exited;}
+    rmSync(dataDir,{recursive:true,force:true});
   }
 });

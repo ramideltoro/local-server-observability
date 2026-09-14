@@ -122,7 +122,7 @@ export function startWebsiteMonitor({
           description: s.description,
           status:
             !sample || Date.now() / 1000 - sample.checkedAt > 180
-              ? "unavailable"
+              ? "unknown"
               : sample.success
                 ? "healthy"
                 : "degraded",

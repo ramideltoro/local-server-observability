@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import { readState } from "./store.mjs";
 import { nativeCatalog, proxyGrafana, body } from "./native.mjs";
 import { alertCatalog } from "./alerts.mjs";
-export function workspace({ owner, grafana, json, cached, root }) {
+export function workspace({ owner, grafana, json, cached, root, operations }) {
   const rates = new Map();
   return async (req, res, u) => {
     if (
@@ -25,6 +25,7 @@ export function workspace({ owner, grafana, json, cached, root }) {
         return true;
       }
     }
+    if (operations && await operations.handle(req, res, u)) return true;
     const p = u.pathname;
     if (p.startsWith("/grafana/") || p.startsWith("/owner/grafana/")) {
       const privateView = p.startsWith("/owner/");

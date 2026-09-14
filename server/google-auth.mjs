@@ -44,7 +44,7 @@ export function createGoogleAuth(
       .setExpirationTime("12h")
       .sign(secret);
   }
-  async function owner(req) {
+  async function identity(req) {
     if (!configured) return false;
     try {
       const { payload } = await jwtVerify(cookie(req, sessionCookie), secret, {
@@ -55,12 +55,13 @@ export function createGoogleAuth(
       });
       return (
         typeof payload.email === "string" &&
-        emails.includes(payload.email.toLowerCase())
+        emails.includes(payload.email.toLowerCase()) ? createHash("sha256").update(payload.email.toLowerCase()).digest("hex") : false
       );
     } catch {
       return false;
     }
   }
+  async function owner(req) { return !!(await identity(req)); }
   const redirectTo = (res, location, cookies) => {
     res.writeHead(302, {
       Location: location,
@@ -193,5 +194,5 @@ export function createGoogleAuth(
     res.end();
     return true;
   }
-  return { owner, handle };
+  return { owner, identity, handle };
 }
