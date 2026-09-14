@@ -306,3 +306,13 @@ export const mookieMetrics = [
   }
 ];
 publicMetrics.push(...mookieMetrics);
+export const qwenMetrics = [
+  {id:'qwen-model',title:'Production model available',unit:'short',expr:'min(local_server_qwen_health)'},
+  {id:'qwen-requests',title:'Production requests per minute',unit:'short',expr:'60 * sum(rate(local_qwen_requests_total[5m]))'},
+  {id:'qwen-errors',title:'Production errors per minute',unit:'short',expr:'60 * sum(rate(local_qwen_errors_total[5m]))'},
+  {id:'qwen-inflight',title:'Production requests in flight',unit:'short',expr:'sum(local_qwen_inflight)'},
+  {id:'qwen-p95',title:'Production request latency p95',unit:'s',expr:'histogram_quantile(0.95, sum by(le) (rate(local_qwen_duration_seconds_bucket[5m])))'},
+  {id:'qwen-background',title:'Background summary requests',unit:'short',expr:'max(local_qwen_background_requests_total)'},
+  {id:'qwen-background-errors',title:'Background summary failures',unit:'short',expr:'max(local_qwen_background_errors_total)'},
+];
+publicMetrics.push(...qwenMetrics);
