@@ -373,6 +373,14 @@ test("current failures survive older warnings and unavailable evidence without l
     await ops.collect();
     assert.equal(get().status, "fail");
     assert.equal(get().fresh, false);
+    const stored = ops.store.get("health");
+    ops.store.put("health", {
+      ...stored,
+      at: new Date(Date.now() - 600001).toISOString(),
+    });
+    assert.equal(get().status, "fail");
+    assert.equal(get().fresh, false);
+    assert(ops.health().stale);
     const incident = ops.store.incidents()[0];
     const request = async (route, method = "GET", payload, headers = {}) => {
       const req = Readable.from(
