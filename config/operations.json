@@ -202,13 +202,13 @@
         },
         {
           "id": "database-backup-age",
-          "title": "Time since database backup attempt",
+          "title": "Successful cloud database backup age",
           "expr": "time() - max(nutsnews_db_backup_latest_cloud_backup_timestamp_seconds{instance=\"chingadera\"})",
           "scope": "NutsNews database backup",
           "unit": "s",
           "category": "recovery",
           "severity": "warning",
-          "improvement": "The database backup runs daily. Verify a successful cloud snapshot within 30 hours; 48 hours is a failure.",
+          "improvement": "The database backup runs daily: warn after 30 hours, fail after 48. A zero source timestamp means no successful cloud snapshot is recorded; in that case the displayed age reflects the absent timestamp. Verify the cloud upload and a successful snapshot.",
           "warn": 108000,
           "fail": 172800,
           "freshnessSeconds": 300
