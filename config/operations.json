@@ -2053,24 +2053,25 @@
         {
           "id": "freshness",
           "title": "Time since worker success",
-          "expr": "time()-max(nutsnews_worker_last_success_timestamp_seconds)",
+          "expr": "time()-max(nutsnews_backend_legacy_worker_last_scheduled_success_timestamp_seconds{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
           "direction": "above",
-          "fail": 3600,
-          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery.",
-          "warn": 1800,
-          "unit": "s"
+          "improvement": "Inspect scheduled production ingestion history; source-specific scheduling targets remain unverified.",
+          "unit": "s",
+          "measureOnly": true
         },
         {
           "id": "availability:evidence",
-          "title": "Availability evidence",
+          "title": "Latest scheduled production ingestion outcome",
           "category": "availability",
           "severity": "warning",
           "freshnessSeconds": 300,
           "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "expr": "max(nutsnews_backend_legacy_worker_last_scheduled_run_success{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
+          "direction": "below",
+          "fail": 1
         },
         {
           "id": "recovery:evidence",
@@ -2083,12 +2084,14 @@
         },
         {
           "id": "coverage:evidence",
-          "title": "Telemetry freshness",
+          "title": "Production ownership exporter freshness",
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 300,
           "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "expr": "time()-max(nutsnews_backend_metric_scrape_timestamp_seconds{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
+          "warn": 180,
+          "fail": 300
         }
       ]
     },
