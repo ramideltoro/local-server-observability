@@ -1464,10 +1464,11 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "improvement": "Inspect sustained HTTP latency above 2 seconds; the probe timeout is 8 seconds.",
           "expr": "website_probe_duration_seconds{website=\"kubequest\"}",
-          "measureOnly": true,
-          "unit": "s"
+          "unit": "s",
+          "warn": 2,
+          "fail": 8
         },
         {
           "id": "recovery:evidence",
@@ -1547,7 +1548,9 @@
           "severity": "warning",
           "freshnessSeconds": 300,
           "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "expr": "time()-max(local_server_collector_timestamp_seconds)",
+          "warn": 180,
+          "fail": 300
         }
       ]
     },
@@ -2176,10 +2179,11 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "improvement": "Inspect sustained HTTP latency above 2 seconds; the probe timeout is 8 seconds.",
           "expr": "website_probe_duration_seconds{website=\"nutsnews-backend\"}",
-          "measureOnly": true,
-          "unit": "s"
+          "unit": "s",
+          "warn": 2,
+          "fail": 8
         },
         {
           "id": "recovery:evidence",
@@ -2307,10 +2311,11 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "improvement": "Inspect sustained HTTP latency above 2 seconds; the probe timeout is 8 seconds.",
           "expr": "website_probe_duration_seconds{website=\"kubequest-wiki\"}",
-          "measureOnly": true,
-          "unit": "s"
+          "unit": "s",
+          "warn": 2,
+          "fail": 8
         },
         {
           "id": "recovery:evidence",
@@ -2357,10 +2362,11 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "improvement": "Inspect sustained HTTP latency above 2 seconds; the probe timeout is 8 seconds.",
           "expr": "website_probe_duration_seconds{website=\"local-wiki\"}",
-          "measureOnly": true,
-          "unit": "s"
+          "unit": "s",
+          "warn": 2,
+          "fail": 8
         },
         {
           "id": "recovery:evidence",
@@ -2407,10 +2413,11 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "improvement": "Inspect sustained HTTP latency above 2 seconds; the probe timeout is 8 seconds.",
           "expr": "website_probe_duration_seconds{website=\"nutsnews-wiki\"}",
-          "measureOnly": true,
-          "unit": "s"
+          "unit": "s",
+          "warn": 2,
+          "fail": 8
         },
         {
           "id": "recovery:evidence",
@@ -2457,10 +2464,11 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "improvement": "Inspect sustained HTTP latency above 2 seconds; the probe timeout is 8 seconds.",
           "expr": "website_probe_duration_seconds{website=\"legacy-personal\"}",
-          "measureOnly": true,
-          "unit": "s"
+          "unit": "s",
+          "warn": 2,
+          "fail": 8
         },
         {
           "id": "recovery:evidence",
@@ -2652,8 +2660,8 @@
       "to": "external",
       "type": "hosted-on",
       "verified": true,
-      "essential": true,
-      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+      "essential": false,
+      "evidence": "Cloudflare API verified deployed worker scripts on 2026-09-19; host infrastructure is provider-managed."
     },
     {
       "from": "nutsnews-rabbitmq",
@@ -2684,24 +2692,24 @@
       "to": "external",
       "type": "hosted-on",
       "verified": true,
-      "essential": true,
-      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+      "essential": false,
+      "evidence": "GitHub Pages configuration and public HTTPS verified on 2026-09-19; host infrastructure is provider-managed."
     },
     {
       "from": "local-wiki",
       "to": "external",
       "type": "hosted-on",
       "verified": true,
-      "essential": true,
-      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+      "essential": false,
+      "evidence": "GitHub Pages configuration and public HTTPS verified on 2026-09-19; host infrastructure is provider-managed."
     },
     {
       "from": "nutsnews-wiki",
       "to": "external",
       "type": "hosted-on",
       "verified": true,
-      "essential": true,
-      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+      "essential": false,
+      "evidence": "GitHub Pages configuration and public HTTPS verified on 2026-09-19; host infrastructure is provider-managed."
     }
   ],
   "repositories": [

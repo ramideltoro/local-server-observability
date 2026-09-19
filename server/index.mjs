@@ -337,14 +337,18 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === "/api/owner/logs") {
       const w = windowFor(u.searchParams.get("range"));
-      const application = ["local", "backend-vps", "nutsnews-vps"].includes(
+      const application = ["local", "backend-vps", "nutsnews-vps", "raspberry", "mookie"].includes(
         u.searchParams.get("application"),
       )
         ? u.searchParams.get("application")
         : "nutsnews";
       const term = (u.searchParams.get("search") || "").slice(0, 120);
       const selector =
-        application === "local"
+        application === "raspberry"
+          ? '{instance="rpi4",project="raspberry"}'
+          : application === "mookie"
+          ? '{instance="mookie"}'
+          : application === "local"
           ? '{instance="chingadera"}'
           : application === "backend-vps"
             ? '{instance="backend.nutsnews.com"}'
