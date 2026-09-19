@@ -458,3 +458,34 @@ test("inventory checks have unique identities, explicit applicability and accoun
     }));
   assert.equal(forecast(points, now, false, null).sustainedPressure, null);
 });
+
+test('missing evidence has actionable reasons without earning health or coverage credit', () => {
+  const result = scoreSystem(system, [
+    {...checks()[0],status:'unknown',fresh:false,evidenceState:'collecting-history'},
+    {...checks()[1],status:'unknown',fresh:false,evidenceState:'not-configured'},
+    {...checks()[2],status:'unknown',fresh:false,note:'No fresh valid samples'},
+  ]);
+  assert.equal(result.score,0);
+  assert.equal(result.coverage,0);
+  assert.deepEqual(result.deductions.map(c=>c.evidenceState),['collecting-history','not-configured','no-data']);
+  assert(result.deductions.every(c=>c.pointsLost>0));
+  const failed=scoreSystem(system,[{...checks()[0],status:'fail',evidenceState:'no-data'}]);
+  assert.equal(failed.checks[0].status,'fail');
+  assert.equal(failed.checks[0].evidenceState,undefined);
+});
+
+test('registered live signals replace placeholder checks and probe names resolve', async () => {
+  const {websites}=await import('../server/websites.mjs');
+  const config=JSON.parse(fs.readFileSync('config/operations.json'));
+  const byId=id=>config.systems.find(s=>s.id===id).checks;
+  assert(byId('backend-vps').find(c=>c.id==='service:postgresql@18-main').expr.includes('pg_up'));
+  for(const id of ['backend-vps','nutsnews-vps','mookie']) assert(byId(id).find(c=>c.id==='restart-patterns').expr);
+  for(const id of ['backend-vps','nutsnews-vps']) assert(byId(id).find(c=>c.id==='backup-freshness').expr);
+  for(const s of config.systems) for(const c of s.checks) {
+    if(c.expr?.includes('website_probe_')) {
+      const site=c.expr.match(/website="([^"]+)"/)?.[1];
+      assert(websites.some(w=>w.id===site), `${s.id}/${c.id} references an absent website probe`);
+    }
+    if(!['expr','metric','probe','report','coverageSource','recovery','objective'].some(k=>c[k])) assert.equal(c.evidenceState,'not-configured');
+  }
+});

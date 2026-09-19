@@ -32,6 +32,7 @@ const safeCheck = (c) =>
       "scope",
       "unit",
       "configurable",
+      "evidenceState",
     ]
       .filter((k) => c[k] !== undefined)
       .map((k) => [k, c[k]]),
@@ -177,7 +178,8 @@ export async function createOperations({
           let o = {
             status: "unknown",
             fresh: false,
-            note: "Required instrumentation or policy is not available",
+            evidenceState: c.evidenceState || "not-configured",
+            note: c.evidenceNote || "Required instrumentation or policy is not available",
           };
           if (c.probe) {
             const p = lastOverview.services.find((p) => p.id === c.probe);
@@ -247,10 +249,10 @@ export async function createOperations({
                 status:
                   related.length && related.every((m) => m?.state === "live")
                     ? "pass"
-                    : now - Date.parse(lastOverview.updatedAt) < 300000 &&
+                      : !related.length && now - Date.parse(lastOverview.updatedAt) < 300000 &&
                         system.checks.some((x) => x.probe) &&
-                        lastOverview.services.some((p) =>
-                          system.checks.some((x) => x.probe === p.id),
+                        system.checks.filter((x) => x.probe).every((x) =>
+                          x.probe === "observability" || lastOverview.services.some((p) => p.id === x.probe && p.status !== "unknown"),
                         )
                       ? "pass"
                       : "unknown",
@@ -309,7 +311,8 @@ export async function createOperations({
                     ? "warning"
                     : "pass",
               fresh: slo.coverage >= 99,
-              note: slo.note,
+              evidenceState: slo.coverage < 99 ? "collecting-history" : undefined,
+              note: `${slo.note}; ${slo.coverage.toFixed(1)}% of the 30-day window observed`,
               value: slo.availability,
             };
           }
@@ -318,6 +321,7 @@ export async function createOperations({
               ...o,
               status: "unknown",
               fresh: false,
+              evidenceState: "policy-required",
               note: "Value observed, but no verified freshness target is configured",
             };
           // Historical issues remain authoritative until the inspection reconciles them.
@@ -722,6 +726,7 @@ export async function createOperations({
               ? check.status
               : "unknown",
             fresh: false,
+            evidenceState: "no-data",
             note: "Collector stale; prior failures remain unverified until collection completes",
           })),
         ),

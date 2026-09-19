@@ -10,6 +10,7 @@ import {
 function request(status, error = false) {
   return (_url, options, callback) => {
     assert.equal(options.rejectUnauthorized, true);
+    assert.equal(options.agent, false);
     const req = new EventEmitter();
     req.destroy = () => {};
     queueMicrotask(() =>
