@@ -178,8 +178,8 @@ export async function createOperations({
           let o = {
             status: "unknown",
             fresh: false,
-            evidenceState: c.evidenceState || "not-configured",
-            note: c.evidenceNote || "Required instrumentation or policy is not available",
+            evidenceState: c.evidenceState || "no-data",
+            note: c.evidenceNote || "The registered source has no current evidence; verify its collection and latest report",
           };
           if (c.probe) {
             const p = lastOverview.services.find((p) => p.id === c.probe);
