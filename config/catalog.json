@@ -3956,5 +3956,36 @@
         ]
       }
     ]
+  },
+  {
+    "id": "nutsnews-cloud-workers-production",
+    "title": "NutsNews Cloudflare production ingestion",
+    "application": "nutsnews-cloud-workers",
+    "panels": [
+      {
+        "id": "outcome",
+        "title": "Latest scheduled run succeeded",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backend_legacy_worker_last_scheduled_run_success{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})"
+        ]
+      },
+      {
+        "id": "age",
+        "title": "Time since scheduled success",
+        "unit": "s",
+        "queries": [
+          "time()-max(nutsnews_backend_legacy_worker_last_scheduled_success_timestamp_seconds{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})"
+        ]
+      },
+      {
+        "id": "runs",
+        "title": "Scheduled successful runs in 24 hours",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_backend_legacy_worker_successful_scheduled_runs_24h{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})"
+        ]
+      }
+    ]
   }
 ]
