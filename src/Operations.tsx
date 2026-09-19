@@ -7,6 +7,7 @@ export type Check = {
   category: string;
   severity: string;
   status: string;
+  evidenceState?: string;
   fresh: boolean;
   note: string;
   improvement: string;
@@ -331,7 +332,9 @@ function CheckList({ checks }: { checks: Check[] }) {
                     : c.status)
               }
             >
-              {c.status}
+              {c.status === "unknown"
+                ? ({"not-configured": "Setup required", "no-data": "No data", "collecting-history": "Collecting history", "policy-required": "Policy required"}[c.evidenceState || "no-data"] || "No data")
+                : c.status}
             </span>
             <span>{c.title}</span>
             <small>

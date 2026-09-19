@@ -81,6 +81,11 @@ export function scoreSystem(system, observations, now = Date.now()) {
         : 0;
     return {
       ...check,
+      // Explain uncertainty without giving missing evidence health or coverage credit.
+      evidenceState: check.status === "unknown"
+        ? check.evidenceState || (/not yet instrumented|not available/.test(check.note || "")
+          ? "not-configured" : "no-data")
+        : undefined,
       possiblePoints,
       pointsLost: possiblePoints * (1 - (credit[check.status] || 0)),
     };
@@ -109,7 +114,8 @@ export function scoreSystem(system, observations, now = Date.now()) {
           : "bad",
     categories,
     checks: weightedChecks,
-    deductions: weightedChecks.filter((c) => c.status !== "pass"),
+    deductions: weightedChecks.filter((c) => c.status !== "pass").sort((a, b) =>
+      ({fail: 0, warning: 1, unknown: 2}[a.status] - {fail: 0, warning: 1, unknown: 2}[b.status]) || b.pointsLost - a.pointsLost),
     notApplicable: system.notApplicable || {},
   };
 }
@@ -126,7 +132,7 @@ export function metricObservation(check, metric, now = Date.now()) {
         now / 1000 - s[0] > (check.freshnessSeconds || 300),
     )
   )
-    return { status: "unknown", fresh: false, note: "No fresh valid samples" };
+    return { status: "unknown", fresh: false, evidenceState: "no-data", note: "No fresh valid samples; verify the registered source and collector" };
   const values = samples.map((s) => Number(s[1]));
   const value =
     check.direction === "below" ? Math.min(...values) : Math.max(...values);

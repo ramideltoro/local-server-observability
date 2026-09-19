@@ -240,7 +240,8 @@
   margin: 0 12px 6px 75px;
 }
 .ops-status {
-  min-width: 58px;
+  min-width: 100px;
+  flex-shrink: 0;
   font-size: 10px;
   text-transform: capitalize;
 }

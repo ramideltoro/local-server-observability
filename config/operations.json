@@ -160,8 +160,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record a successful isolated recovery test; integrity alone does not prove application recovery.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "image-backup",
@@ -193,19 +195,23 @@
           "unit": "s",
           "category": "recovery",
           "severity": "warning",
-          "measureOnly": true,
-          "improvement": "Confirm the backup cadence and propose warning/failure age targets in Git. Last attempt does not prove last success."
+          "improvement": "The image backup runs weekly. Verify a successful cloud image within eight days; nine days is a failure.",
+          "warn": 691200,
+          "fail": 777600,
+          "freshnessSeconds": 300
         },
         {
           "id": "database-backup-age",
           "title": "Time since database backup attempt",
-          "expr": "time() - max(nutsnews_db_backup_last_run_timestamp_seconds{instance=\"chingadera\"})",
+          "expr": "time() - max(nutsnews_db_backup_latest_cloud_backup_timestamp_seconds{instance=\"chingadera\"})",
           "scope": "NutsNews database backup",
           "unit": "s",
           "category": "recovery",
           "severity": "warning",
-          "measureOnly": true,
-          "improvement": "Confirm the backup cadence and propose warning/failure age targets in Git. Last attempt does not prove last success."
+          "improvement": "The database backup runs daily. Verify a successful cloud snapshot within 30 hours; 48 hours is a failure.",
+          "warn": 108000,
+          "fail": 172800,
+          "freshnessSeconds": 300
         },
         {
           "id": "service:kubequest",
@@ -331,13 +337,13 @@
         },
         {
           "id": "service:postgresql@18-main",
-          "title": "postgresql@18-main service",
+          "title": "PostgreSQL connection health",
           "category": "availability",
           "severity": "critical",
           "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
+          "improvement": "Inspect the PostgreSQL exporter and database connectivity; the systemd umbrella unit alone does not verify database readiness.",
           "essential": true,
-          "expr": "node_systemd_unit_state{instance=\"backend.nutsnews.com\",name=\"postgresql@18-main.service\",state=\"active\"}",
+          "expr": "min(pg_up{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-postgres\"})",
           "direction": "below",
           "fail": 1
         },
@@ -382,9 +388,11 @@
           "title": "Service restart patterns",
           "category": "performance",
           "severity": "warning",
-          "freshnessSeconds": 97200,
+          "freshnessSeconds": 300,
           "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "report": "restart-patterns"
+          "expr": "sum(increase(node_systemd_service_restart_total{instance=\"backend.nutsnews.com\"}[1h]))",
+          "warn": 3,
+          "fail": 10
         },
         {
           "id": "recurring-errors",
@@ -418,18 +426,23 @@
           "title": "Backup freshness",
           "category": "recovery",
           "severity": "warning",
-          "freshnessSeconds": 97200,
+          "freshnessSeconds": 300,
           "improvement": "Verify a backup job, its successful timestamp, and an approved freshness target.",
-          "report": "backup-freshness"
+          "expr": "min(nutsnews_backend_backup_last_success_fresh{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
+          "fail": 1,
+          "direction": "below"
         },
         {
           "id": "restore-test",
-          "title": "Verified recovery test",
+          "title": "PostgreSQL restore drill",
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record a successful isolated recovery test; integrity alone does not prove application recovery.",
-          "missing": true
+          "improvement": "Inspect the existing PostgreSQL restore-drill report. This checks database recovery evidence, not full-host recovery.",
+          "missing": true,
+          "expr": "min(nutsnews_backend_postgres_restore_drill_healthy{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
+          "fail": 1,
+          "direction": "below"
         },
         {
           "id": "backup-integrity",
@@ -444,14 +457,16 @@
         },
         {
           "id": "backup-success-age",
-          "title": "Time since successfully verified backup",
-          "expr": "max(nutsnews_backend_backup_last_success_age_seconds{job=\"nutsnews-backend-host\"})",
+          "title": "Backup age / configured freshness limit",
+          "expr": "max(nutsnews_backend_backup_last_success_age_seconds{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"}) / max(nutsnews_backend_backup_stale_after_seconds{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
           "scope": "NutsNews backend snapshot",
-          "unit": "s",
+          "unit": "ratio",
           "category": "recovery",
           "severity": "warning",
-          "measureOnly": true,
-          "improvement": "Confirm the backup cadence and propose warning/failure age targets in Git. Last attempt does not prove last success."
+          "improvement": "Confirm the backup cadence and propose warning/failure age targets in Git. Last attempt does not prove last success.",
+          "warn": 0.8,
+          "fail": 1,
+          "freshnessSeconds": 300
         }
       ],
       "restartCounterExpr": "sum(node_systemd_service_restart_total{instance=\"backend.nutsnews.com\"})"
@@ -536,9 +551,11 @@
           "title": "Service restart patterns",
           "category": "performance",
           "severity": "warning",
-          "freshnessSeconds": 97200,
+          "freshnessSeconds": 300,
           "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "report": "restart-patterns"
+          "expr": "sum(increase(node_systemd_service_restart_total{instance=\"vps.nutsnews.com\"}[1h]))",
+          "warn": 3,
+          "fail": 10
         },
         {
           "id": "recurring-errors",
@@ -569,12 +586,15 @@
         },
         {
           "id": "backup-freshness",
-          "title": "Backup freshness",
+          "title": "Backup age / configured freshness limit",
           "category": "recovery",
           "severity": "warning",
-          "freshnessSeconds": 97200,
+          "freshnessSeconds": 300,
           "improvement": "Verify a backup job, its successful timestamp, and an approved freshness target.",
-          "report": "backup-freshness"
+          "expr": "max(nutsnews_backup_latest_snapshot_age_seconds{instance=\"vps.nutsnews.com\"}) / max(nutsnews_backup_stale_after_seconds{instance=\"vps.nutsnews.com\"})",
+          "warn": 0.8,
+          "fail": 1,
+          "unit": "ratio"
         },
         {
           "id": "restore-test",
@@ -582,8 +602,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record a successful isolated recovery test; integrity alone does not prove application recovery.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "restartCounterExpr": "sum(node_systemd_service_restart_total{instance=\"vps.nutsnews.com\"})"
@@ -680,8 +702,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record a successful isolated recovery test; integrity alone does not prove application recovery.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "service:alloy",
@@ -868,9 +892,11 @@
           "title": "Service restart patterns",
           "category": "performance",
           "severity": "warning",
-          "freshnessSeconds": 97200,
+          "freshnessSeconds": 300,
           "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "report": "restart-patterns"
+          "expr": "sum(increase(node_systemd_service_restart_total{instance=\"mookie\"}[1h]))",
+          "warn": 3,
+          "fail": 10
         },
         {
           "id": "recurring-errors",
@@ -932,8 +958,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record a successful isolated recovery test; integrity alone does not prove application recovery.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "restartCounterExpr": "sum(node_systemd_service_restart_total{instance=\"mookie\"})"
@@ -980,8 +1008,10 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
+          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No telemetry source is registered for this check."
         },
         {
           "id": "recovery",
@@ -989,8 +1019,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Link this application to a verified backup scope and isolated restore test.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "restore-test",
@@ -998,7 +1030,9 @@
           "category": "recovery",
           "severity": "warning",
           "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "model",
@@ -1060,8 +1094,10 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
+          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No telemetry source is registered for this check."
         },
         {
           "id": "recovery",
@@ -1079,7 +1115,9 @@
           "category": "recovery",
           "severity": "warning",
           "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "objective": {
@@ -1140,8 +1178,10 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
+          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No telemetry source is registered for this check."
         },
         {
           "id": "recovery",
@@ -1149,8 +1189,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Link this application to a verified backup scope and isolated restore test.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "restore-test",
@@ -1158,7 +1200,9 @@
           "category": "recovery",
           "severity": "warning",
           "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "objective": {
@@ -1219,8 +1263,10 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
+          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No telemetry source is registered for this check."
         },
         {
           "id": "recovery",
@@ -1228,8 +1274,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Link this application to a verified backup scope and isolated restore test.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "restore-test",
@@ -1237,7 +1285,9 @@
           "category": "recovery",
           "severity": "warning",
           "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "objective": {
@@ -1288,8 +1338,10 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
+          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No telemetry source is registered for this check."
         },
         {
           "id": "recovery",
@@ -1297,8 +1349,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Link this application to a verified backup scope and isolated restore test.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "certificate",
@@ -1318,7 +1372,9 @@
           "category": "recovery",
           "severity": "warning",
           "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "objective": {
@@ -1369,8 +1425,10 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
+          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No telemetry source is registered for this check."
         },
         {
           "id": "recovery",
@@ -1378,8 +1436,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Link this application to a verified backup scope and isolated restore test.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "certificate",
@@ -1399,7 +1459,9 @@
           "category": "recovery",
           "severity": "warning",
           "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         }
       ],
       "objective": {
@@ -1476,8 +1538,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1529,8 +1593,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1538,8 +1604,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1590,8 +1658,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1599,8 +1669,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1651,8 +1723,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1660,8 +1734,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1712,8 +1788,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1721,8 +1799,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1773,8 +1853,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1782,8 +1864,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1834,8 +1918,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1843,8 +1929,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1895,8 +1983,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1904,8 +1994,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -1956,8 +2048,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -1965,8 +2059,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2017,8 +2113,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -2026,8 +2124,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2052,15 +2152,15 @@
       "checks": [
         {
           "id": "freshness",
-          "title": "Time since worker success",
-          "expr": "time()-max(nutsnews_backend_legacy_worker_last_scheduled_success_timestamp_seconds{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
+          "title": "Scheduled ingestion freshness (15-minute contract)",
+          "expr": "min(nutsnews_backend_legacy_worker_fresh_within_15_minutes{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "direction": "above",
-          "improvement": "Inspect scheduled production ingestion history; source-specific scheduling targets remain unverified.",
+          "direction": "below",
+          "improvement": "Inspect the existing scheduled ingestion status and its 15-minute freshness contract; do not change worker ownership.",
           "unit": "s",
-          "measureOnly": true
+          "fail": 1
         },
         {
           "id": "availability:evidence",
@@ -2079,8 +2179,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2128,12 +2230,15 @@
         },
         {
           "id": "recovery:evidence",
-          "title": "Isolated recovery evidence",
+          "title": "RabbitMQ recovery stages",
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Inspect the existing RabbitMQ recovery-stage report and remediate any unhealthy stage.",
+          "missing": true,
+          "expr": "min(nutsnews_backend_rabbitmq_recovery_stage_healthy{instance=\"backend.nutsnews.com\",job=\"nutsnews-backend-host\"})",
+          "direction": "below",
+          "fail": 1
         },
         {
           "id": "coverage:evidence",
@@ -2186,7 +2291,7 @@
           "expr": "website_probe_duration_seconds{website=\"nutsnews-backend\"}",
           "unit": "s",
           "warn": 2,
-          "fail": 8
+          "fail": 5
         },
         {
           "id": "recovery:evidence",
@@ -2194,8 +2299,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2269,8 +2376,10 @@
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No workload performance check and target are registered."
         },
         {
           "id": "recovery:evidence",
@@ -2278,17 +2387,23 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
-          "title": "Telemetry freshness",
+          "title": "Receiver host collector freshness",
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 300,
           "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
-          "missing": true
+          "missing": true,
+          "expr": "time()-max(raspberry_collector_timestamp_seconds{instance=\"rpi4\"})",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
         }
       ]
     },
@@ -2326,8 +2441,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2377,8 +2494,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2428,8 +2547,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
@@ -2479,8 +2600,10 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Record an isolated recovery test for this application.",
-          "missing": true
+          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
+          "missing": true,
+          "evidenceState": "not-configured",
+          "evidenceNote": "No application-specific recovery verification is registered."
         },
         {
           "id": "coverage:evidence",
