@@ -4,6 +4,10 @@ import { promisify } from "node:util";
 import os from "node:os";
 const run = promisify(execFile);
 export const units = [
+  "kubequest.service",
+  "fantasy-qwen.service",
+  "observe-grafana-public.service",
+  "observe-grafana-owner.service",
   "nutsnews-local-ai.service",
   "ollama.service",
   "cloudflared.service",
@@ -108,6 +112,8 @@ export async function metrics() {
       out.push(
         `local_server_service_restarts_total{service="${u.unit}"} ${Number(u.NRestarts) || 0}`,
       );
+    const cpu = Number(u.CPUUsageNSec);
+    if (Number.isFinite(cpu) && cpu >= 0 && cpu < 1e19) out.push(`local_server_service_cpu_seconds_total{service="${u.unit}"} ${cpu / 1e9}`);
     const memory = Number(u.MemoryCurrent);
     if (Number.isFinite(memory) && memory < 1e15)
       out.push(
@@ -132,6 +138,15 @@ export async function metrics() {
     out.push('local_qwen_background_errors_total '+attempts.filter(a=>a.mode!=="qwen").length);
     out.push('local_qwen_background_duration_seconds_sum '+attempts.reduce((n,a)=>n+(a.durationMs||0)/1000,0));
   } catch {}
+  for (const [application, url] of [["kubequest", "http://127.0.0.1:4340/healthz"], ["fantasy-qwen", "http://127.0.0.1:11435/api/tags"]]) {
+    try {
+      const r = await fetch(url, {signal: AbortSignal.timeout(3000)});
+      const j = await r.json();
+      const healthy = r.ok && (application === "kubequest" ? j.status === "ok" && j.application === "KubeQuest" : Array.isArray(j.models) && j.models.length > 0);
+      out.push(`local_application_health{application="${application}"} ${healthy ? 1 : 0}`);
+      if (application === "kubequest") for (const [capability, ready] of [["labs", j.labReady === true], ["authentication", j.authentication === "google"]]) out.push(`local_application_capability{application="kubequest",capability="${capability}"} ${healthy && ready ? 1 : 0}`);
+    } catch { out.push(`local_application_health{application="${application}"} 0`); }
+  }
   out.push(`local_server_collector_timestamp_seconds ${Date.now() / 1000}`);
   return out.join("\n") + "\n";
 }

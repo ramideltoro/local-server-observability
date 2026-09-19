@@ -1,20 +1,26 @@
 {
   "version": 1,
-  "verifiedAt": "2026-09-13",
+  "verifiedAt": "2026-09-19",
   "servers": [
     {
       "id": "local",
       "name": "Local server",
       "applications": [
         "qwen",
-        "observability"
+        "observability",
+        "kubequest",
+        "fantasy-qwen"
       ],
       "services": [
         "nutsnews-local-ai",
         "ollama",
         "cloudflared",
         "alloy",
-        "local-server-observability"
+        "local-server-observability",
+        "kubequest",
+        "fantasy-qwen",
+        "observe-grafana-owner",
+        "observe-grafana-public"
       ],
       "sources": [
         "metrics",
@@ -28,7 +34,17 @@
       "name": "NutsNews Backend VPS",
       "applications": [
         "nutsnews",
-        "fantasy"
+        "fantasy",
+        "nutsnews-scheduler",
+        "nutsnews-fetcher",
+        "nutsnews-canonicalizer",
+        "nutsnews-enrichment",
+        "nutsnews-approval",
+        "nutsnews-translation",
+        "nutsnews-persistence",
+        "nutsnews-publication",
+        "nutsnews-rabbitmq",
+        "nutsnews-backend"
       ],
       "services": [
         "alloy",
@@ -66,9 +82,10 @@
       "id": "raspberry",
       "name": "Raspberry Pi",
       "applications": [
-        "raspberry-observability"
+        "raspberry-receiver"
       ],
       "services": [
+        "alloy",
         "docker",
         "lighttpd",
         "tar1090",
@@ -77,10 +94,11 @@
       ],
       "sources": [
         "metrics",
-        "logs"
+        "logs",
+        "hardware",
+        "service-exporter"
       ],
-      "evidence": "Running systemd inventory; application container verification pending",
-      "limitation": "Application container hosting and telemetry selectors require verification"
+      "evidence": "SSH verified rpi4, running receiver services and no application containers on 2026-09-19"
     },
     {
       "id": "mookie",
@@ -107,7 +125,12 @@
       "name": "External hosting",
       "applications": [
         "ramideltoro",
-        "showalgo"
+        "showalgo",
+        "nutsnews-cloud-workers",
+        "kubequest-wiki",
+        "local-wiki",
+        "nutsnews-wiki",
+        "legacy-personal"
       ],
       "services": [],
       "sources": [
@@ -121,37 +144,240 @@
     {
       "id": "qwen",
       "name": "Qwen AI",
-      "coverage": "Authenticated health and service exporter; production endpoint unchanged"
+      "coverage": "Authenticated health and service exporter; production endpoint unchanged",
+      "repositories": []
     },
     {
       "id": "observability",
       "name": "Observability",
-      "coverage": "Portal, exporters, daily reports and Grafana"
+      "coverage": "Portal, exporters, daily reports and Grafana",
+      "repositories": [
+        "https://github.com/ramideltoro/local-server-observability",
+        "https://github.com/ramideltoro/local-server-wiki"
+      ]
     },
     {
       "id": "nutsnews",
       "name": "NutsNews",
-      "coverage": "Both VPS hosts, Cloud workers, queues, databases and existing Cloud dashboards"
+      "coverage": "Both VPS hosts, Cloud workers, queues, databases and existing Cloud dashboards",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews"
+      ]
     },
     {
       "id": "fantasy",
       "name": "Fantasy Football Edge",
-      "coverage": "HTTPS and backend/database health; importer and application error instrumentation missing"
-    },
-    {
-      "id": "raspberry-observability",
-      "name": "Raspberry Observability",
-      "coverage": "Existing Cloud dashboard catalog; source coverage reported per inspection"
+      "coverage": "HTTPS and backend/database health; importer and application error instrumentation missing",
+      "repositories": [
+        "https://github.com/ramideltoro/fantasy_football_edge"
+      ]
     },
     {
       "id": "ramideltoro",
       "name": "ramideltoro.com",
-      "coverage": "HTTPS availability, latency and certificate expiry"
+      "coverage": "HTTPS availability, latency and certificate expiry",
+      "repositories": []
     },
     {
       "id": "showalgo",
       "name": "ShowAlgo",
-      "coverage": "HTTPS availability, latency and certificate expiry"
+      "coverage": "HTTPS availability, latency and certificate expiry",
+      "repositories": []
+    },
+    {
+      "id": "kubequest",
+      "name": "KubeQuest",
+      "coverage": "Verified deployed application, HTTPS, Google configuration, lab readiness, CPU, memory and restarts.",
+      "repositories": [
+        "https://github.com/ramideltoro/kubequest"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "80ac5bbff2d2d0bb4c5ee4d8ff8fc3e88e06e0f4",
+        "status": "Running; revision verified through application health endpoint"
+      }
+    },
+    {
+      "id": "fantasy-qwen",
+      "name": "Fantasy Qwen",
+      "coverage": "Private Fantasy inference process and model availability; no prompts or response contents are collected.",
+      "repositories": []
+    },
+    {
+      "id": "nutsnews-scheduler",
+      "name": "NutsNews scheduler",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-feed-scheduler"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "e92d2f93c93fa5ceb507a2e6c9a62f91a46fcc07",
+        "status": "Running shadow container; unhealthy and metrics unavailable"
+      }
+    },
+    {
+      "id": "nutsnews-fetcher",
+      "name": "NutsNews fetcher",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-feed-fetcher"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "905e6af5989bb4eb1eba772cde728f86026eb229",
+        "status": "Running shadow container; healthy"
+      }
+    },
+    {
+      "id": "nutsnews-canonicalizer",
+      "name": "NutsNews canonicalizer",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-article-canonicalizer"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "d6bfe689c7aa5f625bd1204e73fef908ec528366",
+        "status": "Running shadow container; healthy"
+      }
+    },
+    {
+      "id": "nutsnews-enrichment",
+      "name": "NutsNews enrichment",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-article-enrichment"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "2534fa7594ab9a1ad85dad2c15fda6b8a4cb0449",
+        "status": "Running shadow container; healthy"
+      }
+    },
+    {
+      "id": "nutsnews-approval",
+      "name": "NutsNews approval",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-article-approval"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "2f4faf6e42c0e15e5d118a200393057f73d22b01",
+        "status": "Running shadow container; healthy"
+      }
+    },
+    {
+      "id": "nutsnews-translation",
+      "name": "NutsNews translation",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-article-translation"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "2cef02d54f795619e84f3519dba727f113fb1c44",
+        "status": "Stopped shadow container; not a production owner"
+      }
+    },
+    {
+      "id": "nutsnews-persistence",
+      "name": "NutsNews persistence",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-article-persistence"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "d60e6a586b159f724425743ce5f708827921d9db",
+        "status": "Running shadow container; healthy"
+      }
+    },
+    {
+      "id": "nutsnews-publication",
+      "name": "NutsNews publication",
+      "coverage": "Deployed shadow worker; expected_active=0. Runtime and readiness are observed without changing production ownership.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker-article-publication"
+      ],
+      "deployment": {
+        "verifiedAt": "2026-09-19",
+        "revision": "4275cc4441913fb572bf1f1af5c7d99d12009a22",
+        "status": "Running shadow container; healthy"
+      }
+    },
+    {
+      "id": "nutsnews-cloud-workers",
+      "name": "NutsNews Cloudflare workers",
+      "coverage": "Cloudflare API verified controller and 25 worker deployments; production ingestion freshness uses existing Cloud metrics.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-worker"
+      ]
+    },
+    {
+      "id": "nutsnews-rabbitmq",
+      "name": "NutsNews RabbitMQ",
+      "coverage": "Verified running RabbitMQ container; broker availability, queue depth, consumers, memory and throughput.",
+      "repositories": []
+    },
+    {
+      "id": "nutsnews-backend",
+      "name": "NutsNews Backend API",
+      "coverage": "Verified systemd API and PostgreSQL services, readiness endpoint and existing backend dashboards.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-backend"
+      ]
+    },
+    {
+      "id": "raspberry-receiver",
+      "name": "Raspberry ADS-B receiver",
+      "coverage": "Verified tar1090, airplanes-feed and airplanes-mlat services. Aircraft reception is not inferred from service uptime.",
+      "repositories": []
+    },
+    {
+      "id": "kubequest-wiki",
+      "name": "KubeQuest Wiki",
+      "coverage": "Published documentation; HTTPS availability, latency and certificate monitoring.",
+      "repositories": [
+        "https://github.com/ramideltoro/kubequest-wiki"
+      ]
+    },
+    {
+      "id": "local-wiki",
+      "name": "Local Server Wiki",
+      "coverage": "Published documentation; HTTPS availability, latency and certificate monitoring.",
+      "repositories": [
+        "https://github.com/ramideltoro/local-server-wiki"
+      ]
+    },
+    {
+      "id": "nutsnews-wiki",
+      "name": "NutsNews Wiki",
+      "coverage": "Published documentation; HTTPS availability, latency and certificate monitoring.",
+      "repositories": [
+        "https://github.com/ramideltoro/nutsnews-docs"
+      ]
+    },
+    {
+      "id": "legacy-personal",
+      "name": "Legacy personal site",
+      "coverage": "GitHub Pages deployment verified by HTTPS; retained historical personal website.",
+      "repositories": [
+        "https://github.com/ramideltoro/rami-deltoro.github.io"
+      ]
     }
-  ]
+  ],
+  "retired": [
+    {
+      "id": "raspberry-observability",
+      "reason": "No running container or web application found on rpi4; receiver services enrolled separately. Historical dashboards retained."
+    }
+  ],
+  "audit": {
+    "at": "2026-09-19T17:25:26.553Z",
+    "repositoriesScanned": 92,
+    "serversVerified": 5,
+    "method": "GitHub repositories, deployment records, Cloudflare Worker inventory, SSH runtime inventory and HTTP probes. CI success alone is not treated as a deployment."
+  }
 }

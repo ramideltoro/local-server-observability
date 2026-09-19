@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import { EventEmitter } from "node:events";
 import {
+  websites,
   probeWebsite,
   websiteMetrics,
   startWebsiteMonitor,
@@ -76,7 +77,7 @@ test("Scheduled monitoring works without page visits", async () => {
   try {
     await new Promise((r) => setTimeout(r, 25));
     assert(calls >= 4);
-    assert.equal(m.services().length, 4);
+    assert.equal(m.services().length, websites.length);
     assert(m.services().every((s) => s.status === "healthy"));
     assert(m.metrics().includes("website_probe_success"));
   } finally {

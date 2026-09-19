@@ -1,5 +1,10 @@
 import https from "node:https";
 export const websites = [
+  {id:"legacy-personal",name:"Legacy personal site",description:"Verified GitHub Pages deployment",url:"https://ramideltoro.github.io/rami-deltoro.github.io/"},
+  {"id":"kubequest","name":"KubeQuest","url":"https://kubequest.ramideltoro.com/healthz","description":"Verified deployment · HTTPS health"},
+  {"id":"kubequest-wiki","name":"KubeQuest Wiki","url":"https://ramideltoro.github.io/kubequest-wiki/","description":"Verified deployment · HTTPS health"},
+  {"id":"local-wiki","name":"Local Server Wiki","url":"https://localserver.wiki.ramideltoro.com/","description":"Verified deployment · HTTPS health"},
+  {"id":"nutsnews-wiki","name":"NutsNews Wiki","url":"https://wiki.nutsnews.com/","description":"Verified deployment · HTTPS health"},
   {
     id: "fantasy",
     name: "Fantasy Football Edge",

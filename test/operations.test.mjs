@@ -251,7 +251,7 @@ test("public operations are read-only, bounded, sanitized, and require verified 
       release: {},
     });
     await ops.collect();
-    assert.equal(ops.health().systems.length, 12);
+    assert.equal(ops.health().systems.length, JSON.parse(fs.readFileSync("config/operations.json")).systems.length);
     assert(!JSON.stringify(ops.health()).includes("node_systemd_unit_state"));
     async function request(route, method = "GET", payload, headers = {}) {
       const req = Readable.from(
@@ -425,7 +425,7 @@ test("current failures survive older warnings and unavailable evidence without l
 });
 test("inventory checks have unique identities, explicit applicability and accountable deductions", () => {
   const config = JSON.parse(fs.readFileSync("config/operations.json"));
-  assert.equal(new Set(config.systems.map((s) => s.id)).size, 12);
+  assert.equal(new Set(config.systems.map((s) => s.id)).size, config.systems.length);
   for (const s of config.systems) {
     assert.equal(new Set(s.checks.map((c) => c.id)).size, s.checks.length);
     for (const category of [

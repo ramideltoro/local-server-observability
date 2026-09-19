@@ -3107,5 +3107,854 @@
         ]
       }
     ]
+  },
+  {
+    "id": "kubequest-runtime",
+    "title": "KubeQuest application & lab readiness",
+    "application": "kubequest",
+    "panels": [
+      {
+        "id": "health",
+        "title": "Application health",
+        "unit": "short",
+        "queries": [
+          "local_application_health{application=\"kubequest\"}"
+        ]
+      },
+      {
+        "id": "memory",
+        "title": "Service memory",
+        "unit": "bytes",
+        "queries": [
+          "local_server_service_memory_bytes{service=\"kubequest.service\"}"
+        ]
+      },
+      {
+        "id": "cpu",
+        "title": "CPU cores used",
+        "unit": "short",
+        "queries": [
+          "rate(local_server_service_cpu_seconds_total{service=\"kubequest.service\"}[5m])"
+        ]
+      },
+      {
+        "id": "restarts",
+        "title": "Restarts in one hour",
+        "unit": "short",
+        "queries": [
+          "increase(local_server_service_restarts_total{service=\"kubequest.service\"}[1h])"
+        ]
+      },
+      {
+        "id": "labs",
+        "title": "Lab readiness",
+        "unit": "short",
+        "queries": [
+          "local_application_capability{application=\"kubequest\",capability=\"labs\"}"
+        ]
+      },
+      {
+        "id": "auth",
+        "title": "Google configured",
+        "unit": "short",
+        "queries": [
+          "local_application_capability{application=\"kubequest\",capability=\"authentication\"}"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "fantasy-qwen-runtime",
+    "title": "Fantasy Qwen runtime",
+    "application": "fantasy-qwen",
+    "panels": [
+      {
+        "id": "health",
+        "title": "Application health",
+        "unit": "short",
+        "queries": [
+          "local_application_health{application=\"fantasy-qwen\"}"
+        ]
+      },
+      {
+        "id": "memory",
+        "title": "Service memory",
+        "unit": "bytes",
+        "queries": [
+          "local_server_service_memory_bytes{service=\"fantasy-qwen.service\"}"
+        ]
+      },
+      {
+        "id": "cpu",
+        "title": "CPU cores used",
+        "unit": "short",
+        "queries": [
+          "rate(local_server_service_cpu_seconds_total{service=\"fantasy-qwen.service\"}[5m])"
+        ]
+      },
+      {
+        "id": "restarts",
+        "title": "Restarts in one hour",
+        "unit": "short",
+        "queries": [
+          "increase(local_server_service_restarts_total{service=\"fantasy-qwen.service\"}[1h])"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-scheduler-runtime",
+    "title": "NutsNews scheduler · shadow runtime",
+    "application": "nutsnews-scheduler",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"scheduler\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"scheduler\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"scheduler\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"scheduler\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"scheduler\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"scheduler\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-fetcher-runtime",
+    "title": "NutsNews fetcher · shadow runtime",
+    "application": "nutsnews-fetcher",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"fetcher\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"fetcher\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"fetcher\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"fetcher\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"fetcher\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"fetcher\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-canonicalizer-runtime",
+    "title": "NutsNews canonicalizer · shadow runtime",
+    "application": "nutsnews-canonicalizer",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-enrichment-runtime",
+    "title": "NutsNews enrichment · shadow runtime",
+    "application": "nutsnews-enrichment",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"enrichment\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"enrichment\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"enrichment\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"enrichment\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"enrichment\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"enrichment\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-approval-runtime",
+    "title": "NutsNews approval · shadow runtime",
+    "application": "nutsnews-approval",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"approval\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"approval\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"approval\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"approval\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"approval\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"approval\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-translation-runtime",
+    "title": "NutsNews translation · shadow runtime",
+    "application": "nutsnews-translation",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"translation\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"translation\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"translation\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"translation\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"translation\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"translation\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-persistence-runtime",
+    "title": "NutsNews persistence · shadow runtime",
+    "application": "nutsnews-persistence",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"persistence\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"persistence\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"persistence\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"persistence\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"persistence\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"persistence\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-publication-runtime",
+    "title": "NutsNews publication · shadow runtime",
+    "application": "nutsnews-publication",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Metrics reachable",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-worker-uplift\",service=\"publication\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Readiness",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"publication\",probe=\"readiness\",outcome=\"ok\"})"
+        ]
+      },
+      {
+        "id": "active",
+        "title": "Production ownership expected",
+        "unit": "short",
+        "queries": [
+          "max(nutsnews_worker_expected_active{job=\"nutsnews-worker-uplift\",service=\"publication\"})"
+        ]
+      },
+      {
+        "id": "inflight",
+        "title": "In-flight work",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_inflight{job=\"nutsnews-worker-uplift\",service=\"publication\"})"
+        ]
+      },
+      {
+        "id": "consumers",
+        "title": "Consumers",
+        "unit": "short",
+        "queries": [
+          "sum(nutsnews_worker_consumers{job=\"nutsnews-worker-uplift\",service=\"publication\"})"
+        ]
+      },
+      {
+        "id": "events",
+        "title": "Stage events per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(nutsnews_worker_uplift_stage_events_total{job=\"nutsnews-worker-uplift\",service=\"publication\"}[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-rabbitmq-fleet",
+    "title": "NutsNews RabbitMQ live queues",
+    "application": "nutsnews-rabbitmq",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Broker metrics available",
+        "unit": "short",
+        "queries": [
+          "min(up{job=\"nutsnews-rabbitmq\"})"
+        ]
+      },
+      {
+        "id": "ready",
+        "title": "Ready messages",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_queue_messages_ready)"
+        ]
+      },
+      {
+        "id": "unacked",
+        "title": "Unacknowledged messages",
+        "unit": "short",
+        "queries": [
+          "sum(rabbitmq_queue_messages_unacked)"
+        ]
+      },
+      {
+        "id": "rate",
+        "title": "Acknowledgements per second",
+        "unit": "ops",
+        "queries": [
+          "sum(rate(rabbitmq_queue_messages_acked_total[5m]))"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "kubequest-wiki-https",
+    "title": "KubeQuest Wiki availability",
+    "application": "kubequest-wiki",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Availability",
+        "unit": "percent",
+        "queries": [
+          "100*avg_over_time(website_probe_success{website=\"kubequest-wiki\"}[1h])"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "Response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"kubequest-wiki\"}"
+        ]
+      },
+      {
+        "id": "tls",
+        "title": "Certificate lifetime",
+        "unit": "s",
+        "queries": [
+          "website_probe_certificate_expiry_timestamp_seconds{website=\"kubequest-wiki\"}-time()"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "local-wiki-https",
+    "title": "Local Server Wiki availability",
+    "application": "local-wiki",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Availability",
+        "unit": "percent",
+        "queries": [
+          "100*avg_over_time(website_probe_success{website=\"local-wiki\"}[1h])"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "Response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"local-wiki\"}"
+        ]
+      },
+      {
+        "id": "tls",
+        "title": "Certificate lifetime",
+        "unit": "s",
+        "queries": [
+          "website_probe_certificate_expiry_timestamp_seconds{website=\"local-wiki\"}-time()"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "nutsnews-wiki-https",
+    "title": "NutsNews Wiki availability",
+    "application": "nutsnews-wiki",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Availability",
+        "unit": "percent",
+        "queries": [
+          "100*avg_over_time(website_probe_success{website=\"nutsnews-wiki\"}[1h])"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "Response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"nutsnews-wiki\"}"
+        ]
+      },
+      {
+        "id": "tls",
+        "title": "Certificate lifetime",
+        "unit": "s",
+        "queries": [
+          "website_probe_certificate_expiry_timestamp_seconds{website=\"nutsnews-wiki\"}-time()"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "raspberry-host",
+    "title": "Raspberry host resources & hardware",
+    "application": "raspberry-receiver",
+    "panels": [
+      {
+        "id": "raspberry-cpu",
+        "title": "Raspberry CPU",
+        "unit": "percent",
+        "queries": [
+          "100*(1-avg(rate(node_cpu_seconds_total{instance=\"rpi4\",mode=\"idle\"}[5m])))"
+        ]
+      },
+      {
+        "id": "raspberry-temperature",
+        "title": "Raspberry temperature",
+        "unit": "celsius",
+        "queries": [
+          "raspberry_temperature_celsius{instance=\"rpi4\"}"
+        ]
+      },
+      {
+        "id": "raspberry-memory-available",
+        "title": "Raspberry available memory",
+        "unit": "bytes",
+        "queries": [
+          "node_memory_MemAvailable_bytes{instance=\"rpi4\"}"
+        ]
+      },
+      {
+        "id": "raspberry-memory",
+        "title": "Memory used",
+        "unit": "percent",
+        "queries": [
+          "100*(1-max(node_memory_MemAvailable_bytes{instance=\"rpi4\"})/max(node_memory_MemTotal_bytes{instance=\"rpi4\"}))"
+        ]
+      },
+      {
+        "id": "raspberry-disk",
+        "title": "Root disk used",
+        "unit": "percent",
+        "queries": [
+          "100*(1-max(node_filesystem_avail_bytes{instance=\"rpi4\",mountpoint=\"/\"})/max(node_filesystem_size_bytes{instance=\"rpi4\",mountpoint=\"/\"}))"
+        ]
+      },
+      {
+        "id": "raspberry-load",
+        "title": "System load",
+        "unit": "short",
+        "queries": [
+          "max(node_load1{instance=\"rpi4\"})"
+        ]
+      },
+      {
+        "id": "raspberry-availability",
+        "title": "Collector availability",
+        "unit": "percent",
+        "queries": [
+          "100*min(up{instance=\"rpi4\",job=\"integrations/node_exporter\"})"
+        ]
+      },
+      {
+        "id": "raspberry-uptime",
+        "title": "Uptime",
+        "unit": "s",
+        "queries": [
+          "time()-max(node_boot_time_seconds{instance=\"rpi4\"})"
+        ]
+      },
+      {
+        "id": "raspberry-undervoltage",
+        "title": "Undervoltage now",
+        "unit": "short",
+        "queries": [
+          "max(raspberry_undervoltage{instance=\"rpi4\"})"
+        ]
+      },
+      {
+        "id": "raspberry-throttled",
+        "title": "Thermal throttling now",
+        "unit": "short",
+        "queries": [
+          "max(raspberry_throttled{instance=\"rpi4\"})"
+        ]
+      },
+      {
+        "id": "raspberry-hardware-history",
+        "title": "Hardware warning since boot",
+        "unit": "short",
+        "queries": [
+          "max(raspberry_hardware_warning_since_boot{instance=\"rpi4\"})"
+        ]
+      },
+      {
+        "id": "raspberry-receive",
+        "title": "Network receive",
+        "unit": "Bps",
+        "queries": [
+          "sum(rate(node_network_receive_bytes_total{instance=\"rpi4\",device!=\"lo\"}[5m]))"
+        ]
+      },
+      {
+        "id": "raspberry-transmit",
+        "title": "Network transmit",
+        "unit": "Bps",
+        "queries": [
+          "sum(rate(node_network_transmit_bytes_total{instance=\"rpi4\",device!=\"lo\"}[5m]))"
+        ]
+      },
+      {
+        "id": "raspberry-disk-read",
+        "title": "Disk read throughput",
+        "unit": "Bps",
+        "queries": [
+          "sum(rate(node_disk_read_bytes_total{instance=\"rpi4\",device=\"mmcblk0\"}[5m]))"
+        ]
+      },
+      {
+        "id": "raspberry-disk-write",
+        "title": "Disk write throughput",
+        "unit": "Bps",
+        "queries": [
+          "sum(rate(node_disk_written_bytes_total{instance=\"rpi4\",device=\"mmcblk0\"}[5m]))"
+        ]
+      },
+      {
+        "id": "raspberry-iowait",
+        "title": "CPU I/O wait",
+        "unit": "percent",
+        "queries": [
+          "100*avg(rate(node_cpu_seconds_total{instance=\"rpi4\",mode=\"iowait\"}[5m]))"
+        ]
+      },
+      {
+        "id": "raspberry-inodes",
+        "title": "Root inodes used",
+        "unit": "percent",
+        "queries": [
+          "100*(1-max(node_filesystem_files_free{instance=\"rpi4\",mountpoint=\"/\"})/max(node_filesystem_files{instance=\"rpi4\",mountpoint=\"/\"}))"
+        ]
+      },
+      {
+        "id": "raspberry-swap",
+        "title": "Swap used",
+        "unit": "percent",
+        "queries": [
+          "100*(1-max(node_memory_SwapFree_bytes{instance=\"rpi4\"})/clamp_min(max(node_memory_SwapTotal_bytes{instance=\"rpi4\"}),1))"
+        ]
+      },
+      {
+        "id": "raspberry-processes",
+        "title": "Processes",
+        "unit": "short",
+        "queries": [
+          "sum(node_processes_pids{instance=\"rpi4\"})"
+        ]
+      },
+      {
+        "id": "raspberry-services-failed",
+        "title": "Failed services",
+        "unit": "short",
+        "queries": [
+          "sum(node_systemd_unit_state{instance=\"rpi4\",state=\"failed\"})"
+        ]
+      },
+      {
+        "id": "raspberry-restarts",
+        "title": "Service restarts over 1 hour",
+        "unit": "short",
+        "queries": [
+          "sum(increase(node_systemd_service_restart_total{instance=\"rpi4\"}[1h]))"
+        ]
+      },
+      {
+        "id": "raspberry-telemetry-age",
+        "title": "Hardware telemetry age",
+        "unit": "s",
+        "queries": [
+          "time()-max(raspberry_collector_timestamp_seconds{instance=\"rpi4\"})"
+        ]
+      }
+    ]
   }
 ]
