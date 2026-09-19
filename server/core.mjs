@@ -151,19 +151,19 @@ publicMetrics.push(
     id: "raspberry-cpu",
     title: "Raspberry CPU",
     unit: "percent",
-    expr: '100*sum(rate(pi_public_cpu_seconds_total{project="raspberry",mode!="idle"}[5m]))/sum(rate(pi_public_cpu_seconds_total{project="raspberry"}[5m]))',
+    expr: '100*(1-avg(rate(node_cpu_seconds_total{instance="rpi4",mode="idle"}[5m])))',
   },
   {
     id: "raspberry-temperature",
     title: "Raspberry temperature",
     unit: "celsius",
-    expr: 'pi_public_temperature_celsius{project="raspberry"}',
+    expr: 'raspberry_temperature_celsius{instance="rpi4"}',
   },
   {
     id: "raspberry-memory-available",
     title: "Raspberry available memory",
     unit: "bytes",
-    expr: 'pi_public_memory_available_bytes{project="raspberry"}',
+    expr: 'node_memory_MemAvailable_bytes{instance="rpi4"}',
   },
 );
 
@@ -316,3 +316,6 @@ export const qwenMetrics = [
   {id:'qwen-background-errors',title:'Background summary failures',unit:'short',expr:'max(local_qwen_background_errors_total)'},
 ];
 publicMetrics.push(...qwenMetrics);
+
+export const raspberryMetrics = mookieMetrics.map(m => ({...m,id:m.id.replace("mookie-","raspberry-"),expr:m.expr.replaceAll("mookie_","raspberry_").replaceAll('instance="mookie"','instance="rpi4"')})).filter(m=>!publicMetrics.some(p=>p.id===m.id));
+publicMetrics.push(...raspberryMetrics);

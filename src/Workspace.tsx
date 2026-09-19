@@ -43,7 +43,8 @@ type Inventory = {
     evidence: string;
     limitation?: string;
   }[];
-  applications: { id: string; name: string; coverage: string }[];
+  applications: { id: string; name: string; coverage: string; repositories?: string[]; deployment?: {verifiedAt: string; revision: string; status: string} }[];
+  audit?: {at: string; repositoriesScanned: number; serversVerified: number; method: string};
 };
 type Dashboard = {
   id: string;
@@ -709,6 +710,8 @@ export default function Workspace() {
             <p className="ws-description">
               {selected?.evidence || app?.coverage}
             </p>
+            {app?.deployment && <details className="ws-detail"><summary>Verified deployment</summary><p>{app.deployment.status}</p><p>Verified {app.deployment.verifiedAt} · Revision <code>{app.deployment.revision.slice(0,12)}</code></p></details>}
+            {!!app?.repositories?.length && <div className="ws-link-list">{app.repositories.map(url => <a key={url} href={url} target="_blank" rel="noreferrer">{url.split("/").pop()}<ArrowUpRight size={16}/></a>)}</div>}
             {selected?.limitation && (
               <p className="ws-warning">{selected.limitation}</p>
             )}

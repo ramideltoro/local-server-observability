@@ -206,6 +206,50 @@
           "severity": "warning",
           "measureOnly": true,
           "improvement": "Confirm the backup cadence and propose warning/failure age targets in Git. Last attempt does not prove last success."
+        },
+        {
+          "id": "service:kubequest",
+          "title": "kubequest service",
+          "expr": "local_server_service_active{service=\"kubequest.service\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:fantasy-qwen",
+          "title": "fantasy-qwen service",
+          "expr": "local_server_service_active{service=\"fantasy-qwen.service\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:observe-grafana-owner",
+          "title": "observe-grafana-owner service",
+          "expr": "local_server_service_active{service=\"observe-grafana-owner.service\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:observe-grafana-public",
+          "title": "observe-grafana-public service",
+          "expr": "local_server_service_active{service=\"observe-grafana-public.service\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
         }
       ],
       "restartCounterExpr": "sum(local_server_service_restarts_total)"
@@ -584,73 +628,15 @@
           "fail": 85
         },
         {
-          "id": "service:docker",
-          "title": "docker service",
-          "category": "availability",
-          "severity": "critical",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "essential": true,
-          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"docker.service\",state=\"active\"}",
-          "direction": "below",
-          "fail": 1
-        },
-        {
-          "id": "service:lighttpd",
-          "title": "lighttpd service",
-          "category": "availability",
-          "severity": "critical",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "essential": false,
-          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"lighttpd.service\",state=\"active\"}",
-          "direction": "below",
-          "fail": 1
-        },
-        {
-          "id": "service:tar1090",
-          "title": "tar1090 service",
-          "category": "availability",
-          "severity": "critical",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "essential": false,
-          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"tar1090.service\",state=\"active\"}",
-          "direction": "below",
-          "fail": 1
-        },
-        {
-          "id": "service:airplanes-feed",
-          "title": "airplanes-feed service",
-          "category": "availability",
-          "severity": "critical",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "essential": false,
-          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"airplanes-feed.service\",state=\"active\"}",
-          "direction": "below",
-          "fail": 1
-        },
-        {
-          "id": "service:airplanes-mlat",
-          "title": "airplanes-mlat service",
-          "category": "availability",
-          "severity": "critical",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "essential": false,
-          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"airplanes-mlat.service\",state=\"active\"}",
-          "direction": "below",
-          "fail": 1
-        },
-        {
           "id": "restart-patterns",
           "title": "Service restart patterns",
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 97200,
           "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "report": "restart-patterns"
+          "expr": "sum(increase(node_systemd_service_restart_total{instance=\"rpi4\"}[1h]))",
+          "warn": 3,
+          "fail": 10
         },
         {
           "id": "recurring-errors",
@@ -696,6 +682,72 @@
           "freshnessSeconds": 300,
           "improvement": "Record a successful isolated recovery test; integrity alone does not prove application recovery.",
           "missing": true
+        },
+        {
+          "id": "service:alloy",
+          "title": "alloy service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"alloy.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:docker",
+          "title": "docker service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"docker.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:lighttpd",
+          "title": "lighttpd service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"lighttpd.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:tar1090",
+          "title": "tar1090 service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"tar1090.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:airplanes-feed",
+          "title": "airplanes-feed service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"airplanes-feed.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:airplanes-mlat",
+          "title": "airplanes-mlat service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"airplanes-mlat.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
         }
       ],
       "restartCounterExpr": "sum(node_systemd_service_restart_total{instance=\"rpi4\"})"
@@ -1195,74 +1247,6 @@
       }
     },
     {
-      "id": "raspberry-observability",
-      "name": "Raspberry Observability",
-      "kind": "application",
-      "notApplicable": {
-        "resources": "Host resources are scored on the canonical servers; application dependencies are evaluated separately."
-      },
-      "checks": [
-        {
-          "id": "endpoint",
-          "title": "Application endpoint",
-          "category": "availability",
-          "severity": "critical",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
-        },
-        {
-          "id": "objective:availability",
-          "title": "Availability objective",
-          "category": "performance",
-          "severity": "warning",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "objective": "availability"
-        },
-        {
-          "id": "coverage:metrics",
-          "title": "Application metrics",
-          "category": "coverage",
-          "severity": "warning",
-          "freshnessSeconds": 300,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "coverageSource": "metrics"
-        },
-        {
-          "id": "coverage:logs",
-          "title": "Application log coverage",
-          "category": "coverage",
-          "severity": "warning",
-          "freshnessSeconds": 97200,
-          "improvement": "Restore fresh telemetry and resolve the reported condition; verify the check passes.",
-          "missing": true
-        },
-        {
-          "id": "recovery",
-          "title": "Application recovery readiness",
-          "category": "recovery",
-          "severity": "warning",
-          "freshnessSeconds": 300,
-          "improvement": "Link this application to a verified backup scope and isolated restore test.",
-          "missing": true
-        },
-        {
-          "id": "restore-test",
-          "title": "Full application recovery test",
-          "category": "recovery",
-          "severity": "warning",
-          "missing": true,
-          "improvement": "Run and record an isolated application recovery exercise; do not restore over production."
-        }
-      ],
-      "objective": {
-        "availability": 99.9,
-        "windowDays": 30,
-        "provisional": true
-      }
-    },
-    {
       "id": "ramideltoro",
       "name": "ramideltoro.com",
       "kind": "application",
@@ -1423,6 +1407,1083 @@
         "windowDays": 30,
         "provisional": true
       }
+    },
+    {
+      "id": "kubequest",
+      "name": "KubeQuest",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "endpoint:kubequest",
+          "title": "Public endpoint",
+          "probe": "kubequest",
+          "category": "availability",
+          "severity": "critical",
+          "essential": true,
+          "improvement": "Inspect the endpoint and service; verify fresh healthy samples after recovery."
+        },
+        {
+          "id": "health",
+          "title": "Application health",
+          "expr": "local_application_health{application=\"kubequest\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "labs",
+          "title": "Lab runtime ready",
+          "expr": "local_application_capability{application=\"kubequest\",capability=\"labs\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "auth",
+          "title": "Google authentication configured",
+          "expr": "local_application_capability{application=\"kubequest\",capability=\"authentication\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "website_probe_duration_seconds{website=\"kubequest\"}",
+          "measureOnly": true,
+          "unit": "s"
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "time()-website_probe_last_check_timestamp_seconds{website=\"kubequest\"}",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
+        }
+      ]
+    },
+    {
+      "id": "fantasy-qwen",
+      "name": "Fantasy Qwen",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "service",
+          "title": "Inference service",
+          "expr": "local_server_service_active{service=\"fantasy-qwen.service\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "model",
+          "title": "Model available",
+          "expr": "local_application_health{application=\"fantasy-qwen\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-scheduler",
+      "name": "NutsNews scheduler",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"scheduler\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"scheduler\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"scheduler\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-fetcher",
+      "name": "NutsNews fetcher",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"fetcher\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"fetcher\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"fetcher\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-canonicalizer",
+      "name": "NutsNews canonicalizer",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"canonicalizer\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-enrichment",
+      "name": "NutsNews enrichment",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"enrichment\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"enrichment\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"enrichment\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-approval",
+      "name": "NutsNews approval",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"approval\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"approval\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"approval\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-translation",
+      "name": "NutsNews translation",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"translation\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"translation\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"translation\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-persistence",
+      "name": "NutsNews persistence",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"persistence\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"persistence\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"persistence\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-publication",
+      "name": "NutsNews publication",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Metrics endpoint reachable",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"publication\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "ready",
+          "title": "Shadow readiness",
+          "expr": "max(nutsnews_worker_health_probe{job=\"nutsnews-worker-uplift\",service=\"publication\",probe=\"readiness\",outcome=\"ok\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-worker-uplift\",service=\"publication\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-cloud-workers",
+      "name": "NutsNews Cloudflare workers",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "freshness",
+          "title": "Time since worker success",
+          "expr": "time()-max(nutsnews_worker_last_success_timestamp_seconds)",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "above",
+          "fail": 3600,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery.",
+          "warn": 1800,
+          "unit": "s"
+        },
+        {
+          "id": "availability:evidence",
+          "title": "Availability evidence",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-rabbitmq",
+      "name": "NutsNews RabbitMQ",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "scrape",
+          "title": "Broker metrics",
+          "expr": "min(up{job=\"nutsnews-rabbitmq\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "queue",
+          "title": "Ready queue depth",
+          "expr": "sum(rabbitmq_queue_messages_ready)",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "above",
+          "fail": 10000,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery.",
+          "warn": 1000
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "min(up{job=\"nutsnews-rabbitmq\"})",
+          "direction": "below",
+          "fail": 1
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-backend",
+      "name": "NutsNews Backend API",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "endpoint:backend",
+          "title": "Backend readiness",
+          "probe": "backend",
+          "category": "availability",
+          "severity": "critical",
+          "essential": true,
+          "improvement": "Inspect the endpoint and service; verify fresh healthy samples after recovery."
+        },
+        {
+          "id": "metrics",
+          "title": "Backend telemetry",
+          "expr": "min(up{job=\"nutsnews-backend-api\"})",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "website_probe_duration_seconds{website=\"nutsnews-backend\"}",
+          "measureOnly": true,
+          "unit": "s"
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "time()-website_probe_last_check_timestamp_seconds{website=\"nutsnews-backend\"}",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
+        }
+      ]
+    },
+    {
+      "id": "raspberry-receiver",
+      "name": "Raspberry ADS-B receiver",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "service:lighttpd",
+          "title": "lighttpd service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"lighttpd.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:tar1090",
+          "title": "tar1090 service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"tar1090.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:airplanes-feed",
+          "title": "airplanes-feed service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"airplanes-feed.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "service:airplanes-mlat",
+          "title": "airplanes-mlat service",
+          "expr": "node_systemd_unit_state{instance=\"rpi4\",name=\"airplanes-mlat.service\",state=\"active\"}",
+          "category": "availability",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "direction": "below",
+          "fail": 1,
+          "improvement": "Inspect the service and its telemetry; verify fresh passing samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "missing": true
+        }
+      ]
+    },
+    {
+      "id": "kubequest-wiki",
+      "name": "KubeQuest Wiki",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "endpoint:kubequest-wiki",
+          "title": "Published website",
+          "probe": "kubequest-wiki",
+          "category": "availability",
+          "severity": "warning",
+          "improvement": "Inspect the endpoint and service; verify fresh healthy samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "website_probe_duration_seconds{website=\"kubequest-wiki\"}",
+          "measureOnly": true,
+          "unit": "s"
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "time()-website_probe_last_check_timestamp_seconds{website=\"kubequest-wiki\"}",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
+        }
+      ]
+    },
+    {
+      "id": "local-wiki",
+      "name": "Local Server Wiki",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "endpoint:local-wiki",
+          "title": "Published website",
+          "probe": "local-wiki",
+          "category": "availability",
+          "severity": "warning",
+          "improvement": "Inspect the endpoint and service; verify fresh healthy samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "website_probe_duration_seconds{website=\"local-wiki\"}",
+          "measureOnly": true,
+          "unit": "s"
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "time()-website_probe_last_check_timestamp_seconds{website=\"local-wiki\"}",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
+        }
+      ]
+    },
+    {
+      "id": "nutsnews-wiki",
+      "name": "NutsNews Wiki",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource utilization is tracked on the hosting server."
+      },
+      "checks": [
+        {
+          "id": "endpoint:nutsnews-wiki",
+          "title": "Published website",
+          "probe": "nutsnews-wiki",
+          "category": "availability",
+          "severity": "warning",
+          "improvement": "Inspect the endpoint and service; verify fresh healthy samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "website_probe_duration_seconds{website=\"nutsnews-wiki\"}",
+          "measureOnly": true,
+          "unit": "s"
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "time()-website_probe_last_check_timestamp_seconds{website=\"nutsnews-wiki\"}",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
+        }
+      ]
+    },
+    {
+      "id": "legacy-personal",
+      "name": "Legacy personal site",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Hosted on GitHub Pages."
+      },
+      "checks": [
+        {
+          "id": "endpoint",
+          "title": "Published website",
+          "probe": "legacy-personal",
+          "category": "availability",
+          "severity": "warning",
+          "improvement": "Inspect the endpoint and service; verify fresh healthy samples after recovery."
+        },
+        {
+          "id": "performance:evidence",
+          "title": "Application performance",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "website_probe_duration_seconds{website=\"legacy-personal\"}",
+          "measureOnly": true,
+          "unit": "s"
+        },
+        {
+          "id": "recovery:evidence",
+          "title": "Isolated recovery evidence",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Record an isolated recovery test for this application.",
+          "missing": true
+        },
+        {
+          "id": "coverage:evidence",
+          "title": "Telemetry freshness",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "improvement": "Verify the application exporter and fresh samples; missing evidence stays unknown.",
+          "expr": "time()-website_probe_last_check_timestamp_seconds{website=\"legacy-personal\"}",
+          "warn": 180,
+          "fail": 300,
+          "unit": "s"
+        }
+      ]
     }
   ],
   "dependencies": [
@@ -1467,14 +2528,6 @@
       "essential": true
     },
     {
-      "from": "raspberry-observability",
-      "to": "raspberry",
-      "type": "hosted-on",
-      "verified": false,
-      "evidence": "Running systemd inventory; application container verification pending",
-      "essential": false
-    },
-    {
       "from": "nutsnews",
       "to": "qwen",
       "type": "inference",
@@ -1513,6 +2566,142 @@
       "verified": true,
       "essential": false,
       "evidence": "Verified compose deployment: web uses the db service on port 5432 and requires its PostgreSQL health check."
+    },
+    {
+      "from": "kubequest",
+      "to": "local",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "fantasy-qwen",
+      "to": "local",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-scheduler",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-fetcher",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-canonicalizer",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-enrichment",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-approval",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-translation",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-persistence",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-publication",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-cloud-workers",
+      "to": "external",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-rabbitmq",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-backend",
+      "to": "backend-vps",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "raspberry-receiver",
+      "to": "raspberry",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "kubequest-wiki",
+      "to": "external",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "local-wiki",
+      "to": "external",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
+    },
+    {
+      "from": "nutsnews-wiki",
+      "to": "external",
+      "type": "hosted-on",
+      "verified": true,
+      "essential": true,
+      "evidence": "SSH runtime and deployment inventory verified 2026-09-19"
     }
   ],
   "repositories": [
@@ -1533,12 +2722,68 @@
       "system": "nutsnews"
     },
     {
-      "repo": "ramideltoro/raspberry_observability",
-      "system": "raspberry-observability"
-    },
-    {
       "repo": "ramideltoro/fantasy_football_edge",
       "system": "fantasy"
+    },
+    {
+      "repo": "ramideltoro/kubequest",
+      "system": "kubequest"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-feed-scheduler",
+      "system": "nutsnews-scheduler"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-feed-fetcher",
+      "system": "nutsnews-fetcher"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-article-canonicalizer",
+      "system": "nutsnews-canonicalizer"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-article-enrichment",
+      "system": "nutsnews-enrichment"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-article-approval",
+      "system": "nutsnews-approval"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-article-translation",
+      "system": "nutsnews-translation"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-article-persistence",
+      "system": "nutsnews-persistence"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker-article-publication",
+      "system": "nutsnews-publication"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-worker",
+      "system": "nutsnews-cloud-workers"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-backend",
+      "system": "nutsnews-backend"
+    },
+    {
+      "repo": "ramideltoro/kubequest-wiki",
+      "system": "kubequest-wiki"
+    },
+    {
+      "repo": "ramideltoro/local-server-wiki",
+      "system": "local-wiki"
+    },
+    {
+      "repo": "ramideltoro/nutsnews-docs",
+      "system": "nutsnews-wiki"
+    },
+    {
+      "repo": "ramideltoro/rami-deltoro.github.io",
+      "system": "legacy-personal"
     }
   ],
   "ruleAliases": {
