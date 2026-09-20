@@ -237,13 +237,21 @@ const loadRules = () => cached("operations-rules", async () => {
  const [config, groups, alerts, silences] = await Promise.all([grafana("/api/v1/provisioning/alert-rules"),grafana("/api/prometheus/grafana/api/v1/rules"),grafana("/api/alertmanager/grafana/api/v2/alerts"),grafana("/api/alertmanager/grafana/api/v2/silences")]);
  return alertCatalog(config,groups,alerts,new Date().toISOString(),silences);
 },60000);
-const operations = await createOperations({root,overview,query,rules:loadRules,owner,identity,json,release,disabled:env.OPERATIONS_DISABLED === "true"});
+async function logPresence(selector) {
+  const end=Date.now(), p=new URLSearchParams({query:selector,start:String(BigInt(end-3600000)*1000000n),end:String(BigInt(end)*1000000n),limit:"1",direction:"backward"});
+  const j=await grafana('/api/datasources/proxy/uid/'+encodeURIComponent(loki)+'/loki/api/v1/query_range?'+p);
+  const ts=(j.data?.result||[]).flatMap(s=>s.values||[]).map(v=>Number(BigInt(v[0])/1000000n));
+  if(j.status!=="success"||!ts.length) return null;
+  return new Date(Math.max(...ts)).toISOString();
+}
+const operations = await createOperations({root,overview,query,logPresence,rules:loadRules,owner,identity,json,release,disabled:env.OPERATIONS_DISABLED === "true"});
 const handleWorkspace = workspace({ owner, grafana, json, cached, root, operations });
 startGateway(env);
 const rates = new Map();
 const server = http.createServer(async (req, res) => {
   const u = new URL(req.url || "/", "http://localhost");
   const pathname = u.pathname;
+  if (pathname === "/healthz") res.once("finish", () => console.log(JSON.stringify({event:"health-response",status:res.statusCode})));
   res.setHeader("X-Frame-Options", "DENY");
   res.setHeader("Referrer-Policy", "same-origin");
   res.setHeader(

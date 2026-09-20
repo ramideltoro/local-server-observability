@@ -1,3 +1,4 @@
+import { recoveryObservation, applicationLogObservation } from "./recovery-evidence.mjs";
 import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { openOperations } from "./operations-store.mjs";
@@ -83,6 +84,7 @@ export async function createOperations({
   root,
   overview,
   query,
+  logPresence,
   rules,
   owner,
   identity,
@@ -171,6 +173,10 @@ export async function createOperations({
           }
         }),
       );
+      let recoveryEvidence;
+      try { recoveryEvidence = JSON.parse(await fs.readFile("/var/lib/observe-recovery/public/evidence.json", "utf8")); } catch {}
+      const logResults = new Map();
+      for (const s of config.systems) for (const c of s.checks) if(c.logSelector) { try { logResults.set(c.logSelector, await logPresence?.(c.logSelector)); } catch {} }
       const observations = new Map();
       for (const system of config.systems) {
         const checks = [];
@@ -286,6 +292,8 @@ export async function createOperations({
               };
             }
           }
+          if(c.logSelector) { const at=logResults.get(c.logSelector); o=applicationLogObservation(at,now); }
+          if (c.recoveryEvidence) o = recoveryObservation(recoveryEvidence, system.id, c.recoveryEvidence, now);
           if (c.recovery) {
             const recovery = store.get("workspaceRecovery");
             if (recovery)

@@ -486,6 +486,6 @@ test('registered live signals replace placeholder checks and probe names resolve
       const site=c.expr.match(/website="([^"]+)"/)?.[1];
       assert(websites.some(w=>w.id===site), `${s.id}/${c.id} references an absent website probe`);
     }
-    if(!['expr','metric','probe','report','coverageSource','recovery','objective'].some(k=>c[k])) assert.equal(c.evidenceState,'not-configured');
+    if(!['expr','metric','probe','report','coverageSource','recovery','recoveryEvidence','logSelector','objective'].some(k=>c[k])) assert.equal(c.evidenceState,'not-configured');
   }
 });
