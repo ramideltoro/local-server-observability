@@ -101,26 +101,6 @@
       "evidence": "SSH verified rpi4, running receiver services and no application containers on 2026-09-19"
     },
     {
-      "id": "mookie",
-      "name": "Mookie",
-      "applications": [],
-      "services": [
-        "alloy",
-        "ssh",
-        "avahi-daemon",
-        "NetworkManager",
-        "systemd-journald",
-        "systemd-timesyncd"
-      ],
-      "sources": [
-        "metrics",
-        "logs",
-        "hardware",
-        "service-exporter"
-      ],
-      "evidence": "Verified Raspberry Pi 4 Model B, Debian 13 arm64. GitHub deploys Alloy and hardware telemetry through the local-server SSH jump host."
-    },
-    {
       "id": "external",
       "name": "External hosting",
       "applications": [
@@ -372,6 +352,11 @@
     {
       "id": "raspberry-observability",
       "reason": "No running container or web application found on rpi4; receiver services enrolled separately. Historical dashboards retained."
+    },
+    {
+      "id": "mookie",
+      "at": "2026-09-20",
+      "reason": "Owner removed this server from the fleet. Active monitoring and enrollment retired; historical records retained."
     }
   ],
   "audit": {

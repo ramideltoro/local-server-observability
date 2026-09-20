@@ -108,11 +108,13 @@ test("healthy silenced rules stay enabled and no-data remains distinct", () => {
   assert.equal(r.enabled, true);
   assert.equal(r.state, "no-data");
 });
-import { mookieMetrics } from '../server/core.mjs';
+import { mookieMetrics, raspberryMetrics } from '../server/core.mjs';
 import { registeredQueries, queryKey } from '../server/gateway.mjs';
-test('Mookie is scoped and retired applications are absent from active inventory',()=>{
+test('Retired Mookie is absent from inventory and query registry; Raspberry remains monitored',()=>{
   const inventory=JSON.parse(fs.readFileSync(new URL('../config/inventory.json',import.meta.url)));
-  assert.ok(inventory.servers.some(s=>s.id==='mookie'));
+  assert.ok(!inventory.servers.some(s=>s.id==='mookie'));
+  assert.ok(inventory.retired.some(s=>s.id==='mookie'));
+  for(const metric of raspberryMetrics) assert.ok(registeredQueries.has(queryKey(metric.expr)));
   assert.ok(!inventory.applications.some(a=>['skyglow','antenna'].includes(a.id)));
-  for(const metric of mookieMetrics){assert.ok(metric.expr.includes('instance="mookie"'));assert.ok(registeredQueries.has(queryKey(metric.expr)));}
+  for(const metric of mookieMetrics){assert.ok(metric.expr.includes('instance="mookie"'));assert.ok(!registeredQueries.has(queryKey(metric.expr)));}
 });

@@ -305,7 +305,7 @@ export const mookieMetrics = [
     "inspectionThreshold": 180
   }
 ];
-publicMetrics.push(...mookieMetrics);
+// Retired host template retained solely to derive Raspberry metrics below.
 export const qwenMetrics = [
   {id:'qwen-model',title:'Production model available',unit:'short',expr:'min(local_server_qwen_health)'},
   {id:'qwen-requests',title:'Production requests per minute',unit:'short',expr:'60 * sum(rate(local_qwen_requests_total[5m]))'},

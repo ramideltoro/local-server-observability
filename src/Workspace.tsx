@@ -481,7 +481,6 @@ export default function Workspace() {
                 "alerts",
                 "daily-reports",
                 "workspace-editing",
-                "mookie",
               ].map((id) => ({
                 title: id + " runbook",
                 url:
@@ -754,8 +753,6 @@ export default function Workspace() {
                       ? "node"
                       : selected?.id === "backend-vps"
                         ? "backend"
-                        : selected?.id === "mookie"
-                          ? "mookie"
                           : selected?.id === "raspberry"
                             ? "raspberry"
                             : app?.id || "nutsnews",

@@ -345,7 +345,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (pathname === "/api/owner/logs") {
       const w = windowFor(u.searchParams.get("range"));
-      const application = ["local", "backend-vps", "nutsnews-vps", "raspberry", "mookie"].includes(
+      const application = ["local", "backend-vps", "nutsnews-vps", "raspberry"].includes(
         u.searchParams.get("application"),
       )
         ? u.searchParams.get("application")
@@ -354,8 +354,6 @@ const server = http.createServer(async (req, res) => {
       const selector =
         application === "raspberry"
           ? '{instance="rpi4",project="raspberry"}'
-          : application === "mookie"
-          ? '{instance="mookie"}'
           : application === "local"
           ? '{instance="chingadera"}'
           : application === "backend-vps"

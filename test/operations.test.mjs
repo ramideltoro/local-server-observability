@@ -479,7 +479,7 @@ test('registered live signals replace placeholder checks and probe names resolve
   const config=JSON.parse(fs.readFileSync('config/operations.json'));
   const byId=id=>config.systems.find(s=>s.id===id).checks;
   assert(byId('backend-vps').find(c=>c.id==='service:postgresql@18-main').expr.includes('pg_up'));
-  for(const id of ['backend-vps','nutsnews-vps','mookie']) assert(byId(id).find(c=>c.id==='restart-patterns').expr);
+  for(const id of ['backend-vps','nutsnews-vps']) assert(byId(id).find(c=>c.id==='restart-patterns').expr);
   for(const id of ['backend-vps','nutsnews-vps']) assert(byId(id).find(c=>c.id==='backup-freshness').expr);
   for(const s of config.systems) for(const c of s.checks) {
     if(c.expr?.includes('website_probe_')) {
