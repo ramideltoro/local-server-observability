@@ -14,3 +14,12 @@ test('worker recovery describes replay scope without implying production cutover
 test('cloud log coverage requires a fresh collector and fresh application activity',async()=>{const {cloudLogObservation}=await import('../server/recovery-evidence.mjs');const d={version:1,observedAt:new Date(now).toISOString(),systems:{nutsnews:{at:new Date(now-1000).toISOString()}}};assert.equal(cloudLogObservation(d,'nutsnews',now).status,'pass');for(const bad of [undefined,{...d,systems:{}},{...d,observedAt:new Date(now-1200000).toISOString()},{...d,observedAt:new Date(now+1000).toISOString()},{...d,systems:{nutsnews:{at:new Date(now-3600000).toISOString()}}}])assert.equal(cloudLogObservation(bad,'nutsnews',now).status,'unknown');});
 
 test('known local deployment changes invalidate a restore immediately before polling catches up',()=>{assert.equal(recoveryObservation(fixture(),'app','restore',now,'new-release').status,'unknown');assert.equal(recoveryObservation(fixture(),'app','restore',now,'deployed').status,'pass');});
+test('Pi backup readiness expires at 27 hours and never substitutes for a restore',()=>{
+ const d=fixture(), entry=d.systems.app;
+ entry.readiness={...entry.restore,expiresAt:new Date(now+97200000).toISOString(),tests:{'archive-integrity':true,'required-components':true}};
+ delete entry.restore;d.systems.raspberry=entry;
+ assert.equal(recoveryObservation(d,'raspberry','readiness',now).status,'pass');
+ assert.equal(recoveryObservation(d,'raspberry','restore',now).status,'unknown');
+ entry.observedAt=new Date(now+97200000).toISOString();
+ assert.equal(recoveryObservation(d,'raspberry','readiness',now+97200000).status,'unknown');
+});

@@ -693,8 +693,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Verify a backup job, its successful timestamp, and an approved freshness target.",
-          "report": "backup-freshness"
+          "improvement": "Verify a current encrypted off-host Raspberry backup and its downloaded archive integrity. Full restoration is checked separately.",
+          "recoveryEvidence": "readiness"
         },
         {
           "id": "restore-test",
