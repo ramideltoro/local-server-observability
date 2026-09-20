@@ -23,3 +23,8 @@ test('Pi backup readiness expires at 27 hours and never substitutes for a restor
  entry.observedAt=new Date(now+97200000).toISOString();
  assert.equal(recoveryObservation(d,'raspberry','readiness',now+97200000).status,'unknown');
 });
+test('cloud worker recovery names its tested scope without claiming production freshness',()=>{
+ const d=fixture();d.systems['nutsnews-cloud-workers']=d.systems.app;const result=recoveryObservation(d,'nutsnews-cloud-workers','restore',now);
+ assert.equal(result.status,'pass');assert.match(result.note,/production ingestion freshness remains separate/);
+ d.systems.app.revision='changed';assert.equal(recoveryObservation(d,'nutsnews-cloud-workers','restore',now).status,'unknown');
+});

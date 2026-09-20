@@ -20,6 +20,7 @@ export function recoveryObservation(document, system, kind, now = Date.now(), cu
   if (e.outcome !== "pass" || !required.every(t => e.tests?.[t] === true))
     return unknown("Required recovery checks have not all passed");
   if(kind==='restore'&&system==='nutsnews-scheduler')return {status:'pass',fresh:true,at:e.verifiedAt,scope:'Isolated scheduler recovery',note:'Restored feed and lease state, dependency readiness and isolated scheduling verified; live scheduler state is unchanged'};
+  if(kind==='restore'&&system==='nutsnews-cloud-workers')return {status:'pass',fresh:true,at:e.verifiedAt,scope:'Production shard, KV and database restoration',note:'Restored public-feed serving and duplicate replay verified in isolation; production ingestion freshness remains separate'};
   const worker = /^nutsnews-(fetcher|canonicalizer|enrichment|approval|translation|persistence|publication)$/.test(system);
   if (kind === "restore" && worker) return {status:"pass", fresh:true, at:e.verifiedAt, scope:"Isolated worker recovery and duplicate replay", note:"Restored durable state, dependency readiness and completed-message replay verified; production throughput and cutover are outside this drill"};
   return {status: "pass", fresh: true, at: e.verifiedAt, scope: kind === "restore" ? "Isolated application restore" : "Backup and recovery readiness", note: kind === "restore" ? "Restored application behavior verified against the current deployment" : "Archived recovery components verified; restore is evaluated separately"};
