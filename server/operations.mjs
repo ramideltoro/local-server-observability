@@ -1017,7 +1017,7 @@ export async function createOperations({
       };
     else if (route === "incidents")
       result = {
-        incidents: store.incidents().map(({ notes, group, ...i }) => ({
+        incidents: store.incidents().filter(i => config.systems.some(s => s.id === i.system)).map(({ notes, group, ...i }) => ({
           ...i,
           history: store.transitions(i.id),
           related: config.dependencies.filter(

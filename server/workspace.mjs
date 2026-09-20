@@ -137,7 +137,11 @@ export function workspace({ owner, grafana, json, cached, root, operations }) {
         JSON.parse(await fs.readFile(root + "/config/inventory.json", "utf8")),
       );
     if (p.endsWith("/dashboards")) json(res, 200, await nativeCatalog());
-    if (p.endsWith("/issues")) json(res, 200, (await readState()).issues);
+    if (p.endsWith("/issues")) {
+      const inventory = JSON.parse(await fs.readFile(root + "/config/inventory.json", "utf8"));
+      const retired = new Set(inventory.retired.map(s => s.id));
+      json(res, 200, (await readState()).issues.filter(i => !retired.has(i.system)));
+    }
     if (p.endsWith("/reports")) {
       const s = await readState();
       json(res, 200, {
