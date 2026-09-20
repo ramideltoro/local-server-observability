@@ -1,4 +1,4 @@
-import { recoveryObservation, applicationLogObservation } from "./recovery-evidence.mjs";
+import { recoveryObservation, applicationLogObservation, cloudLogObservation } from "./recovery-evidence.mjs";
 import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { openOperations } from "./operations-store.mjs";
@@ -175,6 +175,8 @@ export async function createOperations({
       );
       let recoveryEvidence;
       try { recoveryEvidence = JSON.parse(await fs.readFile("/var/lib/observe-recovery/public/evidence.json", "utf8")); } catch {}
+      let cloudLogs;
+      try { cloudLogs=JSON.parse(await fs.readFile("/var/lib/observe-recovery/public/cloud-logs.json", "utf8")); } catch {}
       const logResults = new Map();
       for (const s of config.systems) for (const c of s.checks) if(c.logSelector) { try { logResults.set(c.logSelector, await logPresence?.(c.logSelector)); } catch {} }
       const observations = new Map();
@@ -292,6 +294,7 @@ export async function createOperations({
               };
             }
           }
+          if(c.cloudLogEvidence) o=cloudLogObservation(cloudLogs,system.id,now);
           if(c.logSelector) { const at=logResults.get(c.logSelector); o=applicationLogObservation(at,now); }
           if (c.recoveryEvidence) o = recoveryObservation(recoveryEvidence, system.id, c.recoveryEvidence, now);
           if (c.recovery) {
