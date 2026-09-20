@@ -600,6 +600,9 @@ export async function createOperations({
         store.put("release", release);
       }
       store.put("lastCollection", now);
+      // Log real completed work, even when nobody opens the health endpoint.
+      // Do not include queries, credentials, request data, or individual findings.
+      console.log(JSON.stringify({event: "operations-collection-completed", systems: systems.length}));
     } finally {
       running = false;
     }
