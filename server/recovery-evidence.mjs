@@ -27,3 +27,11 @@ export function applicationLogObservation(at, now=Date.now()) {
   const time=Date.parse(at), fresh=Number.isFinite(time)&&time<=now+60000&&now-time<3600000;
   return {status:fresh?'pass':'unknown',fresh,at:fresh?at:undefined,note:fresh?'Application-specific log stream has activity within the last hour':'No fresh application log stream observed'};
 }
+
+export function cloudLogObservation(document, system, now=Date.now()) {
+ const observed=Date.parse(document?.observedAt);
+ const valid=document?.version===1&&Number.isFinite(observed)&&observed<=now&&now-observed<20*60000;
+ const result=applicationLogObservation(valid?document.systems?.[system]?.at:null,now);
+ if(result.fresh)result.scope='Production Cloudflare ingestion shards 0–2';
+ return result;
+}

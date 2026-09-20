@@ -1168,10 +1168,8 @@
           "category": "coverage",
           "severity": "warning",
           "freshnessSeconds": 97200,
-          "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No telemetry source is registered for this check."
+          "improvement": "Verify fresh application logs from all three production ingestion shards. Log coverage does not imply successful ingestion.",
+          "cloudLogEvidence": true
         },
         {
           "id": "recovery",
