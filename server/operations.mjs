@@ -96,6 +96,8 @@ export async function createOperations({
   let config = JSON.parse(
     await fs.readFile(root + "/config/operations.json", "utf8"),
   );
+  const inventory = JSON.parse(await fs.readFile(root + "/config/inventory.json", "utf8"));
+  const retiredSystems = new Set(inventory.retired.map(s => s.id));
   const store = openOperations(dir);
   if (!store.get("operationsInitializedAt"))
     store.put("operationsInitializedAt", Date.now());
@@ -1017,7 +1019,7 @@ export async function createOperations({
       };
     else if (route === "incidents")
       result = {
-        incidents: store.incidents().filter(i => config.systems.some(s => s.id === i.system)).map(({ notes, group, ...i }) => ({
+        incidents: store.incidents().filter(i => !retiredSystems.has(i.system)).map(({ notes, group, ...i }) => ({
           ...i,
           history: store.transitions(i.id),
           related: config.dependencies.filter(
