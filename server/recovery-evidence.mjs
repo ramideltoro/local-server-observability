@@ -1,7 +1,7 @@
 // Only the root-owned recovery runner writes this evidence. Never infer a drill
 // from a backup job, nor accept a passing result for a different deployment.
 export const MAX_AGE = 8 * 86400000;
-export function recoveryObservation(document, system, kind, now = Date.now()) {
+export function recoveryObservation(document, system, kind, now = Date.now(), currentRevision) {
   const unknown = (note) => ({status: "unknown", fresh: false, evidenceState: "no-data", note});
   if (document?.version !== 1 || !["readiness", "restore"].includes(kind))
     return unknown("Recovery evidence unavailable");
@@ -11,7 +11,7 @@ export function recoveryObservation(document, system, kind, now = Date.now()) {
   if (![observed, tested, expires].every(Number.isFinite) || observed > now + 60000 || tested > now + 60000 ||
       now - observed > 20 * 60000 || now - tested >= MAX_AGE || expires <= now || expires > tested + MAX_AGE)
     return unknown("Recovery evidence expired or current deployment is unverified");
-  if (!app.revision || app.revision !== e.testedRevision)
+  if (!app.revision || app.revision !== e.testedRevision || (currentRevision && currentRevision !== e.testedRevision))
     return unknown("Deployment changed; isolated recovery must be repeated");
   if (e.outcome === "fail") return {status: "fail", fresh: true, at: e.verifiedAt, note: "Application recovery verification failed; private run evidence retained"};
   if (!/^[a-f0-9]{64}$/.test(e.backupReference || ""))
