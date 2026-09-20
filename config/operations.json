@@ -1009,9 +1009,7 @@
           "severity": "warning",
           "freshnessSeconds": 97200,
           "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No telemetry source is registered for this check."
+          "logSelector": "{instance=\"chingadera\",job=\"local-server-services\",unit=\"nutsnews-local-ai.service\"}"
         },
         {
           "id": "recovery",
@@ -1019,20 +1017,16 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "readiness"
         },
         {
           "id": "restore-test",
           "title": "Full application recovery test",
           "category": "recovery",
           "severity": "warning",
-          "missing": true,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "model",
@@ -1095,9 +1089,7 @@
           "severity": "warning",
           "freshnessSeconds": 97200,
           "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No telemetry source is registered for this check."
+          "logSelector": "{instance=\"chingadera\",job=\"local-server-services\",unit=\"local-server-observability.service\"}"
         },
         {
           "id": "recovery",
@@ -1114,10 +1106,8 @@
           "title": "Full application recovery test",
           "category": "recovery",
           "severity": "warning",
-          "missing": true,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         }
       ],
       "objective": {
@@ -1264,9 +1254,7 @@
           "severity": "warning",
           "freshnessSeconds": 97200,
           "improvement": "Connect a scoped telemetry source and verify its freshness before granting coverage.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No telemetry source is registered for this check."
+          "logSelector": "{host=\"backend.nutsnews.com\",service=\"caddy\",source=\"caddy-access\"} | json request_host=\"request.host\" | request_host=\"fantasy.ramideltoro.com\""
         },
         {
           "id": "recovery",
@@ -1274,20 +1262,16 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "readiness"
         },
         {
           "id": "restore-test",
           "title": "Full application recovery test",
           "category": "recovery",
           "severity": "warning",
-          "missing": true,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         }
       ],
       "objective": {
@@ -1538,10 +1522,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -1604,10 +1586,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2299,10 +2279,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2441,10 +2419,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2494,10 +2470,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2547,10 +2521,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2600,10 +2572,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the private recovery result and rerun the isolated drill for the current deployed revision. Evidence expires after eight days.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
