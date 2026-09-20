@@ -296,7 +296,7 @@ export async function createOperations({
           }
           if(c.cloudLogEvidence) o=cloudLogObservation(cloudLogs,system.id,now);
           if(c.logSelector) { const at=logResults.get(c.logSelector); o=applicationLogObservation(at,now); }
-          if (c.recoveryEvidence) o = recoveryObservation(recoveryEvidence, system.id, c.recoveryEvidence, now);
+          if (c.recoveryEvidence) o = recoveryObservation(recoveryEvidence, system.id, c.recoveryEvidence, now, system.id === "observability" ? release?.portal : undefined);
           if (c.recovery) {
             const recovery = store.get("workspaceRecovery");
             if (recovery)
