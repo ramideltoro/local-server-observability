@@ -2,6 +2,7 @@ import fs from "node:fs/promises";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import os from "node:os";
+import { fantasyWorkloadEvidence } from "./workload-evidence.mjs";
 const run = promisify(execFile);
 export const units = [
   "kubequest.service",
@@ -147,6 +148,19 @@ export async function metrics() {
       if (application === "kubequest") for (const [capability, ready] of [["labs", j.labReady === true], ["authentication", j.authentication === "google"]]) out.push(`local_application_capability{application="kubequest",capability="${capability}"} ${healthy && ready ? 1 : 0}`);
     } catch { out.push(`local_application_health{application="${application}"} 0`); }
   }
+  try {
+    const pid = s.services.find(u => u.unit === "fantasy-qwen.service")?.MainPID;
+    if (Number(pid) > 0) {
+      const evidence = JSON.parse(await fs.readFile("/var/lib/observe-recovery/public/cloud-logs.json", "utf8"));
+      const workload = fantasyWorkloadEvidence(evidence, pid);
+      if (workload) {
+        out.push("fantasy_qwen_workload_deadline_met " + workload.met);
+        out.push("fantasy_qwen_workload_requests " + workload.count);
+        out.push("fantasy_qwen_workload_max_seconds " + workload.maxSeconds);
+        out.push("fantasy_qwen_workload_latest_timestamp_seconds " + workload.latest);
+      }
+    }
+  } catch { /* Missing, inaccessible or oversized logs cannot award performance. */ }
   out.push(`local_server_collector_timestamp_seconds ${Date.now() / 1000}`);
   return out.join("\n") + "\n";
 }
