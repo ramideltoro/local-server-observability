@@ -1561,14 +1561,14 @@
         },
         {
           "id": "performance:evidence",
-          "title": "Application performance",
+          "title": "Production inference request deadline",
           "category": "performance",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register workload latency or throughput telemetry and its expected target. Idle shadow workers cannot establish production performance.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No workload performance check and target are registered."
+          "improvement": "Verify successful real production chat requests complete before the existing 220-second importer deadline. At least five completions in one hour and activity within fifteen minutes are required.",
+          "expr": "fantasy_qwen_workload_deadline_met",
+          "direction": "below",
+          "fail": 1
         },
         {
           "id": "recovery:evidence",
