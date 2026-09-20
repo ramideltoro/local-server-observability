@@ -1639,10 +1639,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the isolated restore result for the current deployed configuration. Live worker state is unchanged.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -1956,10 +1954,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Inspect the isolated restore result for the current deployed configuration. Live worker state is unchanged.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
