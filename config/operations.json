@@ -1710,10 +1710,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Verify the current deployed worker, restored durable state and completed-message replay in isolation. This does not establish production throughput or cutover readiness.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -1775,10 +1773,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Verify the current deployed worker, restored durable state and completed-message replay in isolation. This does not establish production throughput or cutover readiness.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -1840,10 +1836,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Verify the current deployed worker, restored durable state and completed-message replay in isolation. This does not establish production throughput or cutover readiness.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -1905,10 +1899,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Verify the current deployed worker, restored durable state and completed-message replay in isolation. This does not establish production throughput or cutover readiness.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2035,10 +2027,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Verify the current deployed worker, restored durable state and completed-message replay in isolation. This does not establish production throughput or cutover readiness.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",
@@ -2100,10 +2090,8 @@
           "category": "recovery",
           "severity": "warning",
           "freshnessSeconds": 300,
-          "improvement": "Register dated backup and isolated restore-test evidence for this system. Host backup success alone does not prove application recovery.",
-          "missing": true,
-          "evidenceState": "not-configured",
-          "evidenceNote": "No application-specific recovery verification is registered."
+          "improvement": "Verify the current deployed worker, restored durable state and completed-message replay in isolation. This does not establish production throughput or cutover readiness.",
+          "recoveryEvidence": "restore"
         },
         {
           "id": "coverage:evidence",

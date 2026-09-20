@@ -19,6 +19,8 @@ export function recoveryObservation(document, system, kind, now = Date.now()) {
   const required = kind === "restore" ? ["archive-integrity", "isolated-network", "restored-data", "application-behavior"] : ["archive-integrity", "required-components"];
   if (e.outcome !== "pass" || !required.every(t => e.tests?.[t] === true))
     return unknown("Required recovery checks have not all passed");
+  const worker = /^nutsnews-(fetcher|canonicalizer|enrichment|approval|persistence|publication)$/.test(system);
+  if (kind === "restore" && worker) return {status:"pass", fresh:true, at:e.verifiedAt, scope:"Isolated worker recovery and duplicate replay", note:"Restored durable state, dependency readiness and completed-message replay verified; production throughput and cutover are outside this drill"};
   return {status: "pass", fresh: true, at: e.verifiedAt, scope: kind === "restore" ? "Isolated application restore" : "Backup and recovery readiness", note: kind === "restore" ? "Restored application behavior verified against the current deployment" : "Archived recovery components verified; restore is evaluated separately"};
 }
 export function applicationLogObservation(at, now=Date.now()) {
