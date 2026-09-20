@@ -307,6 +307,11 @@ test("public operations are read-only, bounded, sanitized, and require verified 
     );
     assert.equal((await request("/api/public/operations/health")).code, 200);
     assert.equal((await request("/grafana/api/annotations")).code, 200);
+    for (const system of ["mookie", "fleet", "unassigned-service"]) ops.store.incident({id: system, system, status: "Ongoing", notes: "private"});
+    const activeIncidents = await request("/api/public/operations/incidents");
+    assert.deepEqual(activeIncidents.data.incidents.map(i => i.system).sort(), ["fleet", "unassigned-service"]);
+    assert(!JSON.stringify(activeIncidents.data).includes("private"));
+    assert(ops.store.incidents().some(i => i.system === "mookie"), "Retired history must remain stored");
   } finally {
     ops?.close();
     fs.rmSync(dir, { recursive: true, force: true });
