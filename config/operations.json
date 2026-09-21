@@ -2370,6 +2370,131 @@
           "unit": "s"
         }
       ]
+    },
+    {
+      "id": "pricedip",
+      "name": "PriceDip",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Host resource usage is monitored on Local server; process metrics are in the PriceDip dashboard."
+      },
+      "checks": [
+        {
+          "id": "endpoint:pricedip",
+          "title": "Public HTTPS endpoint",
+          "probe": "pricedip",
+          "category": "availability",
+          "severity": "critical",
+          "essential": true,
+          "improvement": "Restore the PriceDip service and Cloudflare route."
+        },
+        {
+          "id": "telemetry",
+          "title": "Telemetry freshness",
+          "expr": "time()-pricedip_telemetry_timestamp_seconds",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 180,
+          "fail": 300,
+          "direction": "above",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "worker",
+          "title": "Worker heartbeat",
+          "expr": "time()-pricedip_worker_heartbeat",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 180,
+          "fail": 300,
+          "direction": "above",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "stale",
+          "title": "Stale tracked products",
+          "expr": "pricedip_stale_products",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 1,
+          "fail": 5,
+          "direction": "above",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "queue",
+          "title": "Queue age",
+          "expr": "pricedip_queue_oldest_age",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 7200,
+          "fail": 10800,
+          "direction": "above",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "backup",
+          "title": "Backup age",
+          "expr": "time()-pricedip_backup_timestamp",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 108000,
+          "fail": 172800,
+          "direction": "above",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "restore",
+          "title": "Restore verification age",
+          "expr": "time()-pricedip_restore_timestamp",
+          "category": "recovery",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 691200,
+          "fail": 777600,
+          "direction": "above",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "docs",
+          "title": "Documentation alignment",
+          "expr": "pricedip_docs_match",
+          "category": "coverage",
+          "severity": "warning",
+          "freshnessSeconds": 300,
+          "warn": 1,
+          "fail": 1,
+          "direction": "below",
+          "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        }
+      ]
+    },
+    {
+      "id": "pricedip-wiki",
+      "name": "PriceDip Wiki",
+      "kind": "application",
+      "notApplicable": {
+        "resources": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately.",
+        "performance": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately.",
+        "recovery": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately.",
+        "coverage": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately."
+      },
+      "checks": [
+        {
+          "id": "endpoint:pricedip-wiki",
+          "title": "Wiki HTTPS endpoint",
+          "probe": "pricedip-wiki",
+          "category": "availability",
+          "severity": "critical",
+          "essential": true,
+          "improvement": "Inspect the PriceDip Wiki Pages workflow and domain."
+        }
+      ]
     }
   ],
   "dependencies": [
@@ -2588,6 +2713,30 @@
       "verified": true,
       "essential": false,
       "evidence": "GitHub Pages configuration and public HTTPS verified on 2026-09-19; host infrastructure is provider-managed."
+    },
+    {
+      "from": "pricedip",
+      "to": "local",
+      "type": "hosted-on",
+      "verified": true,
+      "evidence": "Dedicated systemd services",
+      "essential": true
+    },
+    {
+      "from": "pricedip",
+      "to": "qwen",
+      "type": "depends-on",
+      "verified": true,
+      "evidence": "Local Ollama research; price monitoring is independent",
+      "essential": false
+    },
+    {
+      "from": "pricedip",
+      "to": "observability",
+      "type": "monitored-by",
+      "verified": true,
+      "evidence": "Private metrics collected by Observe; existing sessions work independently",
+      "essential": false
     }
   ],
   "repositories": [
@@ -2670,6 +2819,14 @@
     {
       "repo": "ramideltoro/rami-deltoro.github.io",
       "system": "legacy-personal"
+    },
+    {
+      "repo": "ramideltoro/pricedip",
+      "system": "pricedip"
+    },
+    {
+      "repo": "ramideltoro/pricedip-wiki",
+      "system": "pricedip-wiki"
     }
   ],
   "ruleAliases": {

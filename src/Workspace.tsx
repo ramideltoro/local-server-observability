@@ -43,7 +43,7 @@ type Inventory = {
     evidence: string;
     limitation?: string;
   }[];
-  applications: { id: string; name: string; coverage: string; repositories?: string[]; deployment?: {verifiedAt: string; revision: string; status: string} }[];
+  applications: { id: string; name: string; coverage: string; url?: string; repositories?: string[]; deployment?: {verifiedAt: string; revision: string; status: string} }[];
   audit?: {at: string; repositoriesScanned: number; serversVerified: number; method: string};
 };
 type Dashboard = {
@@ -710,6 +710,7 @@ export default function Workspace() {
               {selected?.evidence || app?.coverage}
             </p>
             {app?.deployment && <details className="ws-detail"><summary>Verified deployment</summary><p>{app.deployment.status}</p><p>Verified {app.deployment.verifiedAt} · Revision <code>{app.deployment.revision.slice(0,12)}</code></p></details>}
+            {app?.url && <div className="ws-link-list"><a href={app.url} target="_blank" rel="noreferrer">Open {app.name}<ArrowUpRight size={16}/></a>{app.id === "pricedip" && <a href="https://pricedip-wiki.ramideltoro.com" target="_blank" rel="noreferrer">PriceDip documentation<ArrowUpRight size={16}/></a>}</div>}
             {!!app?.repositories?.length && <div className="ws-link-list">{app.repositories.map(url => <a key={url} href={url} target="_blank" rel="noreferrer">{url.split("/").pop()}<ArrowUpRight size={16}/></a>)}</div>}
             {selected?.limitation && (
               <p className="ws-warning">{selected.limitation}</p>

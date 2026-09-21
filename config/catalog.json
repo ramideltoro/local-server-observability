@@ -3812,5 +3812,171 @@
         ]
       }
     ]
+  },
+  {
+    "id": "pricedip-runtime",
+    "title": "PriceDip · Runtime and recovery",
+    "application": "pricedip",
+    "panels": [
+      {
+        "id": "availability",
+        "title": "Application availability",
+        "unit": "short",
+        "queries": [
+          "pricedip_up"
+        ]
+      },
+      {
+        "id": "requests",
+        "title": "Requests",
+        "unit": "short",
+        "queries": [
+          "pricedip_http_requests_total"
+        ]
+      },
+      {
+        "id": "errors",
+        "title": "Server errors",
+        "unit": "short",
+        "queries": [
+          "pricedip_http_errors_total"
+        ]
+      },
+      {
+        "id": "memory",
+        "title": "Memory",
+        "unit": "bytes",
+        "queries": [
+          "pricedip_memory_bytes"
+        ]
+      },
+      {
+        "id": "heartbeat",
+        "title": "Worker heartbeat age",
+        "unit": "s",
+        "queries": [
+          "time()-pricedip_worker_heartbeat"
+        ]
+      },
+      {
+        "id": "queue",
+        "title": "Pending jobs",
+        "unit": "short",
+        "queries": [
+          "pricedip_queue_pending"
+        ]
+      },
+      {
+        "id": "queue-age",
+        "title": "Oldest queued job",
+        "unit": "s",
+        "queries": [
+          "pricedip_queue_oldest_age"
+        ]
+      },
+      {
+        "id": "stale",
+        "title": "Products stale for over two hours",
+        "unit": "short",
+        "queries": [
+          "pricedip_stale_products"
+        ]
+      },
+      {
+        "id": "success",
+        "title": "Successful checks",
+        "unit": "short",
+        "queries": [
+          "pricedip_checks_success_total"
+        ]
+      },
+      {
+        "id": "source-failures",
+        "title": "Failed source checks",
+        "unit": "short",
+        "queries": [
+          "pricedip_checks_failed_total"
+        ]
+      },
+      {
+        "id": "qwen",
+        "title": "Last Qwen duration",
+        "unit": "s",
+        "queries": [
+          "pricedip_qwen_last_duration_seconds"
+        ]
+      },
+      {
+        "id": "qwen-errors",
+        "title": "Qwen failures",
+        "unit": "short",
+        "queries": [
+          "pricedip_qwen_failures_total"
+        ]
+      },
+      {
+        "id": "email",
+        "title": "Pending email",
+        "unit": "short",
+        "queries": [
+          "pricedip_email_pending"
+        ]
+      },
+      {
+        "id": "email-failed",
+        "title": "Email failures",
+        "unit": "short",
+        "queries": [
+          "pricedip_email_failures_total"
+        ]
+      },
+      {
+        "id": "backup",
+        "title": "Backup age",
+        "unit": "s",
+        "queries": [
+          "time()-pricedip_backup_timestamp"
+        ]
+      },
+      {
+        "id": "restore",
+        "title": "Restore verification age",
+        "unit": "s",
+        "queries": [
+          "time()-pricedip_restore_timestamp"
+        ]
+      },
+      {
+        "id": "docs",
+        "title": "Documentation matches deployment",
+        "unit": "short",
+        "queries": [
+          "pricedip_docs_match"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pricedip-wiki-health",
+    "title": "PriceDip Wiki · Publishing health",
+    "application": "pricedip-wiki",
+    "panels": [
+      {
+        "id": "up",
+        "title": "Wiki HTTPS",
+        "unit": "short",
+        "queries": [
+          "website_probe_success{website=\"pricedip-wiki\"}"
+        ]
+      },
+      {
+        "id": "latency",
+        "title": "Wiki response time",
+        "unit": "s",
+        "queries": [
+          "website_probe_duration_seconds{website=\"pricedip-wiki\"}"
+        ]
+      }
+    ]
   }
 ]

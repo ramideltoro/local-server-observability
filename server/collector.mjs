@@ -5,6 +5,7 @@ import os from "node:os";
 import { fantasyWorkloadEvidence } from "./workload-evidence.mjs";
 const run = promisify(execFile);
 export const units = [
+  "pricedip.service", "pricedip-worker.service", "pricedip-search.service",
   "kubequest.service",
   "fantasy-qwen.service",
   "observe-grafana-public.service",
@@ -161,6 +162,12 @@ export async function metrics() {
       }
     }
   } catch { /* Missing, inaccessible or oversized logs cannot award performance. */ }
+  try {
+    const r=await fetch("http://127.0.0.1:4350/internal/metrics",{headers:{Authorization:"Bearer "+process.env.PRICEDIP_METRICS_TOKEN},signal:AbortSignal.timeout(4000)});
+    if(!r.ok)throw Error("PriceDip metrics unavailable");
+    const text=await r.text();
+    for(const line of text.split("\n"))if(/^pricedip_[a-z_]+ [0-9.e+\-]+$/.test(line))out.push(line);
+  } catch { out.push("pricedip_up 0"); }
   out.push(`local_server_collector_timestamp_seconds ${Date.now() / 1000}`);
   return out.join("\n") + "\n";
 }

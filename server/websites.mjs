@@ -1,5 +1,7 @@
 import https from "node:https";
 export const websites = [
+  {id:"pricedip",name:"PriceDip",url:"https://pricedip.ramideltoro.com/healthz",description:"Product research and price tracking"},
+  {id:"pricedip-wiki",name:"PriceDip Wiki",url:"https://pricedip-wiki.ramideltoro.com/",description:"Versioned PriceDip documentation"},
   {id:"nutsnews-backend",name:"NutsNews backend response",description:"Backend readiness response time",url:"https://backend.nutsnews.com/readyz"},
   {id:"legacy-personal",name:"Legacy personal site",description:"Verified GitHub Pages deployment",url:"https://ramideltoro.github.io/rami-deltoro.github.io/"},
   {"id":"kubequest","name":"KubeQuest","url":"https://kubequest.ramideltoro.com/healthz","description":"Verified deployment · HTTPS health"},

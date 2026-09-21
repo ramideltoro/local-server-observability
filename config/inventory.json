@@ -9,7 +9,8 @@
         "qwen",
         "observability",
         "kubequest",
-        "fantasy-qwen"
+        "fantasy-qwen",
+        "pricedip"
       ],
       "services": [
         "nutsnews-local-ai",
@@ -20,7 +21,10 @@
         "kubequest",
         "fantasy-qwen",
         "observe-grafana-owner",
-        "observe-grafana-public"
+        "observe-grafana-public",
+        "pricedip",
+        "pricedip-worker",
+        "pricedip-search"
       ],
       "sources": [
         "metrics",
@@ -110,7 +114,8 @@
         "kubequest-wiki",
         "local-wiki",
         "nutsnews-wiki",
-        "legacy-personal"
+        "legacy-personal",
+        "pricedip-wiki"
       ],
       "services": [],
       "sources": [
@@ -346,6 +351,24 @@
       "repositories": [
         "https://github.com/ramideltoro/rami-deltoro.github.io"
       ]
+    },
+    {
+      "id": "pricedip",
+      "name": "PriceDip",
+      "url": "https://pricedip.ramideltoro.com",
+      "repositories": [
+        "https://github.com/ramideltoro/pricedip"
+      ],
+      "coverage": "HTTPS probes, release and documentation alignment; PriceDip runtime, queues, Qwen, collection freshness and recovery evidence."
+    },
+    {
+      "id": "pricedip-wiki",
+      "name": "PriceDip Wiki",
+      "url": "https://pricedip-wiki.ramideltoro.com",
+      "repositories": [
+        "https://github.com/ramideltoro/pricedip-wiki"
+      ],
+      "coverage": "HTTPS probes, release and documentation alignment; PriceDip runtime, queues, Qwen, collection freshness and recovery evidence."
     }
   ],
   "retired": [

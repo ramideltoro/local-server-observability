@@ -3,6 +3,7 @@ import { createRemoteJWKSet, jwtVerify, SignJWT } from "jose";
 const sessionCookie = "__Host-observe-session";
 const flowCookie = "__Host-observe-flow";
 export function safeReturn(value) {
+  if (typeof value === "string" && /^\/auth\/pricedip\?state=[A-Za-z0-9_-]{43}$/.test(value)) return value;
   return typeof value === "string" && /^\/owner\/(?:#[a-z-]+)?$/.test(value)
     ? value
     : "/owner/";
@@ -90,6 +91,17 @@ export function createGoogleAuth(
     if (!configured) {
       res.writeHead(503);
       res.end("Google sign-in is not configured.");
+      return true;
+    }
+    if (url.pathname === "/auth/pricedip") {
+      const state = url.searchParams.get("state") || "";
+      if (!/^[A-Za-z0-9_-]{43}$/.test(state) || !env.PRICEDIP_AUTH_BRIDGE_SECRET) { res.writeHead(400); res.end("Invalid PriceDip sign-in request"); return true; }
+      try {
+        const {payload} = await jwtVerify(cookie(req, sessionCookie), secret, {issuer:origin,audience:"observe-owner",algorithms:["HS256"],maxTokenAge:"12h"});
+        if(payload.email !== "rami.deltoro@gmail.com") { res.writeHead(403); res.end("PriceDip owner account required"); return true; }
+        const token=await new SignJWT({email:payload.email,state}).setProtectedHeader({alg:"HS256"}).setIssuer(origin).setAudience("pricedip").setIssuedAt().setJti(randomBytes(16).toString("hex")).setExpirationTime("60s").sign(new TextEncoder().encode(env.PRICEDIP_AUTH_BRIDGE_SECRET));
+        redirectTo(res,"https://pricedip.ramideltoro.com/auth/callback?token="+encodeURIComponent(token));
+      } catch { redirectTo(res,"/auth/google?returnTo="+encodeURIComponent("/auth/pricedip?state="+state)); }
       return true;
     }
     if (url.pathname === "/auth/google") {
