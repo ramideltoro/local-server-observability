@@ -1,4 +1,5 @@
 import { recoveryObservation, applicationLogObservation, cloudLogObservation } from "./recovery-evidence.mjs";
+import { workflowObservation } from "./workflow-evidence.mjs";
 import fs from "node:fs/promises";
 import { createHash } from "node:crypto";
 import { openOperations } from "./operations-store.mjs";
@@ -296,6 +297,7 @@ export async function createOperations({
               };
             }
           }
+          if(c.githubWorkflow) o=workflowObservation(store.get("github-workflows:"+c.githubWorkflow.repository),c.githubWorkflow.name,now);
           if(c.cloudLogEvidence) o=cloudLogObservation(cloudLogs,system.id,now);
           if(c.logSelector) { const at=logResults.get(c.logSelector); o=applicationLogObservation(at,now); }
           if (c.recoveryEvidence) o = recoveryObservation(recoveryEvidence, system.id, c.recoveryEvidence, now, system.id === "observability" ? release?.portal : undefined);
@@ -629,10 +631,11 @@ export async function createOperations({
         );
         if (!response.ok) throw Error();
         const data = await response.json();
+        store.put("github-workflows:"+repository.repo,{at:Date.now(),runs:(data.workflow_runs || []).map(({name,head_branch,event,status,conclusion})=>({name,head_branch,event,status,conclusion}))});
         for (const run of data.workflow_runs || []) {
           if (
             run.event === "pull_request" ||
-            !/deploy|release|manage local server|daily fleet inspection|backup|restore/i.test(
+            !/deploy|release|manage local server|daily fleet inspection|backup|restore|publish wiki|check documentation alignment/i.test(
               run.name,
             ) ||
             run.status !== "completed"
@@ -672,6 +675,7 @@ export async function createOperations({
             repository.repo + ": history limited to the latest 100 runs",
           );
       } catch {
+        store.put("github-workflows:"+repository.repo,{at:Date.now(),error:true,runs:[]});
         gaps.push(repository.repo + ": deployment source unavailable");
       }
     }

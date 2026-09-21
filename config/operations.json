@@ -2495,6 +2495,17 @@
           "fail": 1,
           "direction": "below",
           "improvement": "Check the private dependency service. Price collection and the public website remain independently monitored."
+        },
+        {
+          "id": "github-validation",
+          "title": "Release validation and documentation gate",
+          "category": "coverage",
+          "severity": "warning",
+          "githubWorkflow": {
+            "repository": "ramideltoro/pricedip",
+            "name": "Validate PriceDip"
+          },
+          "improvement": "Review the latest main-branch workflow in GitHub. Restore matching source documentation and publish successfully before deploying."
         }
       ]
     },
@@ -2505,8 +2516,7 @@
       "notApplicable": {
         "resources": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately.",
         "performance": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately.",
-        "recovery": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately.",
-        "coverage": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately."
+        "recovery": "Static documentation; source history and GitHub Pages workflow provide recovery, with endpoint probes recorded separately."
       },
       "checks": [
         {
@@ -2517,6 +2527,28 @@
           "severity": "critical",
           "essential": true,
           "improvement": "Inspect the PriceDip Wiki Pages workflow and domain."
+        },
+        {
+          "id": "github-publication",
+          "title": "Wiki publication workflow",
+          "category": "coverage",
+          "severity": "warning",
+          "githubWorkflow": {
+            "repository": "ramideltoro/pricedip-wiki",
+            "name": "Publish wiki"
+          },
+          "improvement": "Review the latest main-branch workflow in GitHub. Restore matching source documentation and publish successfully before deploying."
+        },
+        {
+          "id": "github-reconciliation",
+          "title": "Daily documentation reconciliation",
+          "category": "coverage",
+          "severity": "warning",
+          "githubWorkflow": {
+            "repository": "ramideltoro/pricedip-wiki",
+            "name": "Check documentation alignment"
+          },
+          "improvement": "Review the latest main-branch workflow in GitHub. Restore matching source documentation and publish successfully before deploying."
         }
       ]
     }
