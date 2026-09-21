@@ -3953,6 +3953,70 @@
         "queries": [
           "pricedip_docs_match"
         ]
+      },
+      {
+        "id": "latency",
+        "title": "Mean request latency",
+        "unit": "s",
+        "queries": [
+          "rate(pricedip_http_duration_seconds_total[5m])/clamp_min(rate(pricedip_http_requests_total[5m]),0.001)"
+        ]
+      },
+      {
+        "id": "qwen-up",
+        "title": "Qwen model availability",
+        "unit": "short",
+        "queries": [
+          "pricedip_qwen_available"
+        ]
+      },
+      {
+        "id": "search-up",
+        "title": "Search service availability",
+        "unit": "short",
+        "queries": [
+          "pricedip_search_available"
+        ]
+      },
+      {
+        "id": "email-sent",
+        "title": "Delivered email",
+        "unit": "short",
+        "queries": [
+          "pricedip_email_sent_total"
+        ]
+      },
+      {
+        "id": "email-budget",
+        "title": "Email budget exhausted",
+        "unit": "short",
+        "queries": [
+          "pricedip_email_budget_exhausted"
+        ]
+      },
+      {
+        "id": "deployment",
+        "title": "Time since deployment",
+        "unit": "s",
+        "queries": [
+          "time()-pricedip_deployment_timestamp"
+        ]
+      },
+      {
+        "id": "rollback",
+        "title": "Time since rollback",
+        "unit": "s",
+        "queries": [
+          "time()-pricedip_rollback_timestamp"
+        ]
+      },
+      {
+        "id": "by-source",
+        "title": "Source failures",
+        "unit": "short",
+        "queries": [
+          "{__name__=~\"pricedip_source_.*_failures_total\"}"
+        ]
       }
     ]
   },

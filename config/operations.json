@@ -2471,6 +2471,30 @@
           "fail": 1,
           "direction": "below",
           "improvement": "Inspect PriceDip source status, worker and monitoring evidence. See the PriceDip operations guide."
+        },
+        {
+          "id": "qwen",
+          "title": "Qwen model availability",
+          "expr": "pricedip_qwen_available",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 180,
+          "warn": 1,
+          "fail": 1,
+          "direction": "below",
+          "improvement": "Check the private dependency service. Price collection and the public website remain independently monitored."
+        },
+        {
+          "id": "search",
+          "title": "Private search availability",
+          "expr": "pricedip_search_available",
+          "category": "performance",
+          "severity": "warning",
+          "freshnessSeconds": 180,
+          "warn": 1,
+          "fail": 1,
+          "direction": "below",
+          "improvement": "Check the private dependency service. Price collection and the public website remain independently monitored."
         }
       ]
     },
